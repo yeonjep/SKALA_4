@@ -78,7 +78,7 @@ def safe_load_csv(file_path: Path) -> list[dict[str, Any]] | None:
 # --------------------------------------------------
 
 class SalesRecord(BaseModel):
-    """매출 데이터 한 건을 검증하는 Pydantic 모델."""
+    """매출 데이터 한 건을 검증하는 Pydantic 모델"""
 
     month: str = Field(min_length=1)
     region: str = Field(min_length=1)
@@ -97,7 +97,7 @@ class SalesRecord(BaseModel):
             len(parts) != 2
             or len(parts[0]) != 4
             or len(parts[1]) != 2
-            or not all(part.isdigit() for part in parts)
+           or not all(part.isdigit() for part in parts)
         ):
             raise ValueError("month는 YYYY-MM 형식이어야 합니다.")
 
