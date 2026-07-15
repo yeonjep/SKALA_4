@@ -43,23 +43,15 @@ logger = logging.getLogger(__name__)
 
 def safe_load_csv(file_path: Path) -> list[dict[str, Any]] | None:
     """
-    데이터 파일을 안전하게 읽어 sales 리스트를 반환한다.
+    데이터 파일을 읽고 sales 데이터를 반환한다.
 
-    파일이 없거나 형식이 잘못된 경우 None을 반환하고,
-    성공한 경우 딕셔너리 리스트를 반환한다.
+    - 파일이 없거나 형식이 잘못된 경우: None 반환
+    - 성공한 경우: 딕셔너리로 구성된 리스트 반환
     """
-
-    namespace: dict[str, Any] = {}
 
     try:
         with open(file_path, "r", encoding="utf-8") as file:
-            file_content = file.read()
-
-        # 제공된 파일이 sales = [...] 형태이므로
-        # 별도의 namespace에서 파일 내용을 실행한다.
-        exec(file_content, {"__builtins__": {}}, namespace)
-
-        sales = namespace["sales"]
+            sales = json.load(file)
 
         if not isinstance(sales, list):
             raise TypeError("sales 데이터가 리스트 형식이 아닙니다.")
@@ -71,12 +63,8 @@ def safe_load_csv(file_path: Path) -> list[dict[str, Any]] | None:
         logger.error("파일을 찾을 수 없습니다: %s", file_path)
         return None
 
-    except KeyError:
-        logger.error("파일 안에 sales 데이터가 없습니다.")
-        return None
-
-    except SyntaxError as error:
-        logger.error("파일 문법 오류: %s", error)
+    except json.JSONDecodeError as error:
+        logger.error("JSON 파일 형식 오류: %s", error)
         return None
 
     except TypeError as error:
@@ -94,55 +82,65 @@ def safe_load_csv(file_path: Path) -> list[dict[str, Any]] | None:
 class SalesRecord(BaseModel):
     """매출 데이터 한 건을 검증하는 Pydantic 모델."""
 
-    date: str = Field(min_length=1)
+    month: str = Field(min_length=1)
     region: str = Field(min_length=1)
     amount: int = Field(gt=0)
     category: str | None = None
 
-    @field_validator("date")
+    @field_validator("month")
     @classmethod
-    def validate_date(cls, value: str) -> str:
-        """date가 YYYY-MM-DD 형식인지 확인한다."""
+    def validate_month(cls, value: str) -> str:
+        """month가 YYYY-MM 형식인지 검증"""
 
+        value = value.strip()
         parts = value.split("-")
 
         if (
-            len(parts) != 3
+            len(parts) != 2
             or len(parts[0]) != 4
             or len(parts[1]) != 2
-            or len(parts[2]) != 2
             or not all(part.isdigit() for part in parts)
         ):
-            raise ValueError("date는 YYYY-MM-DD 형식이어야 합니다.")
+            raise ValueError("month는 YYYY-MM 형식이어야 합니다.")
+
+        month_number = int(parts[1])
+
+        if not 1 <= month_number <= 12:
+            raise ValueError("month의 월은 01부터 12 사이여야 합니다.")
 
         return value
 
     @field_validator("region")
     @classmethod
     def validate_region(cls, value: str) -> str:
-        """공백으로만 구성된 region을 허용하지 않는다."""
+        """region이 빈 문자열 또는 공백인지 검증"""
 
-        if not value.strip():
+        value = value.strip()
+
+        if not value:
             raise ValueError("region은 비어 있을 수 없습니다.")
 
-        return value.strip()
+        return value
 
 
 # --------------------------------------------------
-# 실습용 검증 데이터 구성
+# 더미 검증 데이터
 # --------------------------------------------------
 
-def create_raw_data(sales: list[dict[str, Any]]) -> list[dict[str, Any]]:
+def create_raw_data(
+    sales: list[dict[str, Any]],
+) -> list[dict[str, Any]]:
     """
-    원본 sales 데이터로부터 검증용 데이터 7건을 만든다.
+    원본 sales 데이터로 검증용 데이터 7건 생성
 
-    정상 데이터 4건과 오류 데이터 3건을 구성하여
-    Pydantic 검증 성공 및 실패 상황을 모두 확인한다.
+    정상 데이터 4건 + 오류 데이터 3건
+    -> Pydantic 검증 성공 및 실패 상황을 확인
     """
 
+    # 원본 데이터의 앞 4건을 정상 데이터로 사용
     raw_data = [
         {
-            "date": f"{sale['month']}-01",
+            "month": sale["month"],
             "region": sale["region"],
             "amount": sale["amount"],
             "category": sale.get("category"),
@@ -150,12 +148,12 @@ def create_raw_data(sales: list[dict[str, Any]]) -> list[dict[str, Any]]:
         for sale in sales[:4]
     ]
 
-    # category는 선택 필드이므로 첫 번째 데이터에서 제거해도 정상이다.
+    # category는 선택 필드이므로 없어도 정상 처리
     raw_data[0].pop("category")
 
-    # 오류 데이터 1: date가 비어 있음
-    invalid_date = {
-        "date": "",
+    # 오류 데이터 1: month가 비어 있음
+    invalid_month = {
+        "month": "",
         "region": sales[4]["region"],
         "amount": sales[4]["amount"],
         "category": sales[4]["category"],
@@ -163,7 +161,7 @@ def create_raw_data(sales: list[dict[str, Any]]) -> list[dict[str, Any]]:
 
     # 오류 데이터 2: region이 비어 있음
     invalid_region = {
-        "date": f"{sales[5]['month']}-01",
+        "month": sales[5]["month"],
         "region": "",
         "amount": sales[5]["amount"],
         "category": sales[5]["category"],
@@ -171,14 +169,14 @@ def create_raw_data(sales: list[dict[str, Any]]) -> list[dict[str, Any]]:
 
     # 오류 데이터 3: amount가 0 이하
     invalid_amount = {
-        "date": f"{sales[6]['month']}-01",
+        "month": sales[6]["month"],
         "region": sales[6]["region"],
         "amount": 0,
         "category": sales[6]["category"],
     }
 
     raw_data.extend([
-        invalid_date,
+        invalid_month,
         invalid_region,
         invalid_amount,
     ])
@@ -194,10 +192,10 @@ def validate_records(
     raw_data: list[dict[str, Any]],
 ) -> tuple[list[SalesRecord], list[dict[str, Any]]]:
     """
-    raw_data를 SalesRecord 모델로 검증한다.
+    raw_data를 순회하며 SalesRecord 모델로 검증
 
-    검증 성공 데이터는 valid에 저장하고,
-    검증 실패 데이터는 원본 행과 오류 내용을 errors에 저장한다.
+    - 검증 성공: valid 리스트에 저장
+    - 검증 실패: 원본 row와 오류 내용을 errors 리스트에 저장
     """
 
     valid: list[SalesRecord] = []
@@ -217,7 +215,7 @@ def validate_records(
 
             errors.append({
                 "row": row,
-                "error": error.errors(),
+                "error": error.errors(include_context=False),
             })
 
     return valid, errors
@@ -231,16 +229,21 @@ def save_valid_records(
     records: list[SalesRecord],
     file_path: Path,
 ) -> None:
-    """검증을 통과한 데이터를 CSV 파일로 저장한다."""
+    """검증 통과 -> CSV 파일로 저장"""
 
     field_names = [
-        "date",
+        "month",
         "region",
         "amount",
         "category",
     ]
 
-    with open(file_path, "w", encoding="utf-8", newline="") as file:
+    with open(
+        file_path,
+        "w",
+        encoding="utf-8",
+        newline="",
+    ) as file:
         writer = csv.DictWriter(
             file,
             fieldnames=field_names,
@@ -258,7 +261,7 @@ def save_errors(
     errors: list[dict[str, Any]],
     file_path: Path,
 ) -> None:
-    """검증에 실패한 데이터를 JSON 파일로 저장한다."""
+    """검증 실패 -> JSON 파일로 저장"""
 
     with open(file_path, "w", encoding="utf-8") as file:
         json.dump(
@@ -278,7 +281,7 @@ def save_errors(
 def reload_valid_records(
     file_path: Path,
 ) -> list[dict[str, str]]:
-    """저장된 CSV 파일을 다시 읽어 딕셔너리 리스트로 반환한다."""
+    """저장된 CSV를 다시 읽어 딕셔너리 리스트로 반환"""
 
     with open(file_path, "r", encoding="utf-8") as file:
         reader = csv.DictReader(file)
@@ -290,15 +293,14 @@ def reload_valid_records(
 # --------------------------------------------------
 
 def main() -> None:
-    """데이터 로딩부터 검증, 저장, 재로딩까지 수행한다."""
+    """데이터 로딩 -> 검증 -> 저장 및 재로딩"""
 
     sales = safe_load_csv(DATA_FILE)
 
-    # 파일 로딩 실패 여부 확인
+    # Checkpoint: 파일이 없을 때 None이 반환되는지 확인할 때 활용한다.
     assert sales is not None, "데이터 파일 로딩에 실패했습니다."
 
     raw_data = create_raw_data(sales)
-
     valid, errors = validate_records(raw_data)
 
     print("\n[검증 결과]")
@@ -306,7 +308,7 @@ def main() -> None:
     print(f"정상 데이터: {len(valid)}건")
     print(f"오류 데이터: {len(errors)}건")
 
-    # Checkpoint: 정상 4건, 오류 3건인지 확인
+    # Checkpoint: 정상 4건, 오류 3건 확인
     assert len(valid) == 4, "정상 데이터는 4건이어야 합니다."
     assert len(errors) == 3, "오류 데이터는 3건이어야 합니다."
 
@@ -318,7 +320,7 @@ def main() -> None:
     print("\n[재로딩 결과]")
     print(f"CSV에서 다시 읽은 데이터: {len(reloaded)}건")
 
-    # Checkpoint: 저장 후 다시 읽은 데이터가 4건인지 확인
+    # Checkpoint: 저장한 정상 데이터가 4건인지 확인
     assert len(reloaded) == 4, "재로딩한 데이터는 4건이어야 합니다."
 
     print("\n[유효 데이터]")
