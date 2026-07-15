@@ -1,4 +1,4 @@
-sales = [
+[
     {"region": "서울", "category": "전자", "amount": 1500, "month": "2024-01"},
     {"region": "부산", "category": "의류", "amount": 800, "month": "2024-01"},
     {"region": "서울", "category": "의류", "amount": 1200, "month": "2024-02"},

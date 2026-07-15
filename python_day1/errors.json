@@ -1,7 +1,7 @@
 [
     {
         "row": {
-            "date": "",
+            "month": "",
             "region": "서울",
             "amount": 2100,
             "category": "전자"
@@ -10,20 +10,17 @@
             {
                 "type": "string_too_short",
                 "loc": [
-                    "date"
+                    "month"
                 ],
                 "msg": "String should have at least 1 character",
                 "input": "",
-                "ctx": {
-                    "min_length": 1
-                },
                 "url": "https://errors.pydantic.dev/2.13/v/string_too_short"
             }
         ]
     },
     {
         "row": {
-            "date": "2024-02-01",
+            "month": "2024-02",
             "region": "",
             "amount": 650,
             "category": "전자"
@@ -36,16 +33,13 @@
                 ],
                 "msg": "String should have at least 1 character",
                 "input": "",
-                "ctx": {
-                    "min_length": 1
-                },
                 "url": "https://errors.pydantic.dev/2.13/v/string_too_short"
             }
         ]
     },
     {
         "row": {
-            "date": "2024-02-01",
+            "month": "2024-02",
             "region": "대구",
             "amount": 0,
             "category": "의류"
@@ -58,9 +52,6 @@
                 ],
                 "msg": "Input should be greater than 0",
                 "input": 0,
-                "ctx": {
-                    "gt": 0
-                },
                 "url": "https://errors.pydantic.dev/2.13/v/greater_than"
             }
         ]
