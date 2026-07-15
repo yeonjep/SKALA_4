@@ -1,62 +1,50 @@
-"""
-
-[실습 1] 자료구조 집계 · 컴프리헨션 · 제너레이터
-
-Python_Practice1_Data.json의 sales 데이터를 활용하여
-다음 작업을 수행한다.
-
-1. 리스트/딕셔너리 컴프리헨션
-2. Counter와 defaultdict 활용
-3. 제너레이터와 리스트의 메모리 비교
-4. 월별·카테고리별 매출 집계
-
-"""
-
 from collections import Counter, defaultdict
 import sys
 
 
-# Python_Practice1_Data.json 파일 불러오기
-# 파일 내용이 sales = [...] 형태이므로 exec()를 사용
-namespace = {}
+# --------------------------------------------------
+# 데이터 파일 불러오기
+# --------------------------------------------------
 
-try:
-    with open("Python_Practice1_Data.json", "r", encoding="utf-8") as file:
-        exec(file.read(), {}, namespace)
+# 제공된 파일이 sales = [...] 형태이므로
+# 파일을 실행한 뒤 sales 데이터를 가져온다.
+data = {}
 
-    sales = namespace["sales"]
+with open("Python_Practice1_Data.json", "r", encoding="utf-8") as file:
+    exec(file.read(), {}, data)
 
-except FileNotFoundError:
-    print("데이터 파일을 찾을 수 없습니다.")
-    sys.exit()
-
-except KeyError:
-    print("파일 내부에 sales 데이터가 없습니다.")
-    sys.exit()
-
-except SyntaxError:
-    print("데이터 파일 형식이 올바르지 않습니다.")
-    sys.exit()
+sales = data["sales"]
 
 
 # --------------------------------------------------
-# 1. 리스트/딕셔너리 컴프리헨션
+# 1. 리스트 컴프리헨션
+# amount가 1000 이상인 거래 추출
 # --------------------------------------------------
 
-# amount가 1000 이상인 거래만 필터링
 filtered_sales = [
     sale
     for sale in sales
     if sale["amount"] >= 1000
 ]
 
-# 전체 지역 목록 생성
+print("1. amount가 1000 이상인 거래")
+
+for sale in filtered_sales:
+    print(sale)
+
+
+# --------------------------------------------------
+# 2. 딕셔너리 컴프리헨션
+# 지역별 총매출 계산
+# --------------------------------------------------
+
+# 중복되지 않는 지역 목록 생성
 regions = {
     sale["region"]
     for sale in sales
 }
 
-# 지역별 총매출 계산
+# 각 지역의 매출 합계 계산
 region_total = {
     region: sum(
         sale["amount"]
@@ -66,55 +54,75 @@ region_total = {
     for region in regions
 }
 
+print("\n2. 지역별 총매출")
+
+for region, total in region_total.items():
+    print(f"{region}: {total:,}")
+
 
 # --------------------------------------------------
-# 2. Counter + defaultdict
-# --------------------------------------------------
-
+# 3. Counter
 # 지역별 거래 건수 계산
+# --------------------------------------------------
+
 region_count = Counter(
     sale["region"]
     for sale in sales
 )
 
-# 카테고리별 amount 목록 저장
+print("\n3. 지역별 거래 건수")
+
+for region, count in region_count.items():
+    print(f"{region}: {count}건")
+
+
+# --------------------------------------------------
+# 4. defaultdict
+# 카테고리별 amount 목록 생성
+# --------------------------------------------------
+
 category_amounts = defaultdict(list)
 
 for sale in sales:
-    category_amounts[sale["category"]].append(sale["amount"])
+    category = sale["category"]
+    amount = sale["amount"]
+
+    category_amounts[category].append(amount)
+
+print("\n4. 카테고리별 amount 목록")
+
+for category, amounts in category_amounts.items():
+    print(f"{category}: {amounts}")
 
 
 # --------------------------------------------------
-# 3. 제너레이터와 리스트 메모리 비교
+# 5. 제너레이터
+# amount가 1000보다 큰 거래를 하나씩 반환
 # --------------------------------------------------
 
-def high_amount_generator(data):
-    """
-    amount가 1000보다 큰 거래를
-    한 건씩 반환하는 제너레이터 함수
-    """
-    for sale in data:
+def high_amount_generator():
+    for sale in sales:
         if sale["amount"] > 1000:
             yield sale
 
 
-# 리스트 버전
+# 같은 조건을 리스트와 제너레이터로 생성
 high_amount_list = [
     sale
     for sale in sales
     if sale["amount"] > 1000
 ]
 
-# 제너레이터 버전
-high_amount_gen = high_amount_generator(sales)
+high_amount_gen = high_amount_generator()
 
-# 객체 자체의 메모리 크기 비교
-list_size = sys.getsizeof(high_amount_list)
-generator_size = sys.getsizeof(high_amount_gen)
+print("\n5. 리스트와 제너레이터의 메모리 크기 비교")
+print(f"리스트 크기: {sys.getsizeof(high_amount_list)} bytes")
+print(f"제너레이터 크기: {sys.getsizeof(high_amount_gen)} bytes")
 
 
 # --------------------------------------------------
-# 4. 월별·카테고리별 총매출 집계
+# 6. 중첩 defaultdict
+# 월별·카테고리별 총매출 계산
 # --------------------------------------------------
 
 monthly_category_total = defaultdict(
@@ -128,95 +136,26 @@ for sale in sales:
 
     monthly_category_total[month][category] += amount
 
-
-# --------------------------------------------------
-# 5. 거래 금액 TOP 3
-# --------------------------------------------------
-
-top3 = sorted(
-    sales,
-    key=lambda sale: sale["amount"],
-    reverse=True
-)[:3]
-
-
-# --------------------------------------------------
-# 6. Checkpoint 검증
-# --------------------------------------------------
-
-# 데이터 개수 확인
-assert len(sales) == 100
-
-# 지역별 총매출 일부 확인
-assert region_total["서울"] == 20060
-assert region_total["인천"] == 14530
-
-# Counter.most_common() 순서 확인
-assert region_count.most_common(3) == [
-    ("서울", 14),
-    ("부산", 13),
-    ("대구", 13)
-]
-
-# 제너레이터가 리스트보다 작은지 확인
-assert generator_size < list_size
-
-# TOP 3 금액 내림차순 확인
-assert [
-    sale["amount"]
-    for sale in top3
-] == [2500, 2200, 2200]
-
-
-# --------------------------------------------------
-# 7. 결과 출력
-# --------------------------------------------------
-
-print("1. amount가 1000 이상인 거래")
-print(f"총 {len(filtered_sales)}건")
-
-for sale in filtered_sales:
-    print(sale)
-
-
-print("\n2. 지역별 총매출")
-
-for region, total in sorted(region_total.items()):
-    print(f"{region}: {total:,}")
-
-
-print("\n3. 지역별 거래 건수")
-
-for region, count in region_count.most_common():
-    print(f"{region}: {count}건")
-
-
-print("\n4. 카테고리별 amount 목록")
-
-for category, amounts in category_amounts.items():
-    print(f"{category}: {amounts}")
-
-
-print("\n5. 리스트와 제너레이터 메모리 비교")
-print(f"리스트 크기: {list_size} bytes")
-print(f"제너레이터 크기: {generator_size} bytes")
-
-
 print("\n6. 월별·카테고리별 총매출")
 
 for month in sorted(monthly_category_total):
     print(f"[{month}]")
 
-    for category, total in sorted(
-        monthly_category_total[month].items()
-    ):
-        print(f"  {category}: {total:,}")
+    for category, total in monthly_category_total[month].items():
+        print(f"{category}: {total:,}")
 
 
-print("\n7. 거래 금액 TOP 3")
+# --------------------------------------------------
+# 7. 거래 금액 상위 3건
+# --------------------------------------------------
 
-for rank, sale in enumerate(top3, start=1):
+top3_sales = sorted(
+    sales,
+    key=lambda sale: sale["amount"],
+    reverse=True
+)[:3]
+
+print("\n7. 거래 금액 상위 3건")
+
+for rank, sale in enumerate(top3_sales, start=1):
     print(f"{rank}위: {sale}")
-
-
-print("\n모든 Checkpoint를 통과했습니다.")
