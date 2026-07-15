@@ -26,14 +26,12 @@ import sys
 # 데이터 파일 불러오기
 # --------------------------------------------------
 
-# 실행 위치와 관계없이 현재 Python 파일과 같은 폴더의
-# 데이터 파일을 찾도록 경로를 설정한다.
+# 데이터 파일 불러오기 
 data_path = Path(__file__).with_name("Python_Practice1_Data.json")
 data = {}
 
 try:
-    # 제공된 데이터 파일은 sales = [...] 형태이므로
-    # 파일 내용을 실행한 후 sales 변수를 가져온다.
+    # 제공된 데이터 파일이 sales = [...] 형태이므로 파일 내용을 실행한 후 sales 변수 가져오기
     with open(data_path, "r", encoding="utf-8") as file:
         exec(file.read(), {}, data)
 
@@ -110,11 +108,10 @@ for sale in sales:
 
 # --------------------------------------------------
 # 5. 제너레이터
-# amount가 1000보다 큰 거래를 하나씩 반환
+# amount > 1000인 거래를 하나씩 반환
 # --------------------------------------------------
 
 def high_amount_generator(data):
-    """amount가 1000보다 큰 거래를 한 건씩 반환한다."""
 
     for sale in data:
         if sale["amount"] > 1000:
