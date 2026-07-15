@@ -7,9 +7,8 @@ from pydantic import ValidationError
 
 from models import WeatherRecord
 
-
+# 정상 날씨는 통과하고 잘못된 강수확률은 실패하는지 확인
 def test_weather_record_validation() -> None:
-    """정상 날씨는 통과하고 잘못된 강수확률은 실패하는지 확인한다."""
 
     valid_weather = WeatherRecord(
         time="2026-07-15T15:00",

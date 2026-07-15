@@ -46,20 +46,18 @@ PARQUET_FILE = OUTPUT_DIR / "collected_data.parquet"
 # API 호출
 # --------------------------------------------------
 
+# 지정한 API를 호출하고 JSON 응답을 반환한다.
 async def fetch_json(
     client: httpx.AsyncClient,
     url: str,
 ) -> Any:
-    """지정한 API를 호출하고 JSON 응답을 반환한다."""
-
     response = await client.get(url)
     response.raise_for_status()
     return response.json()
 
 
+# 3개 API를 asyncio.gather()로 동시에 호출한다.
 async def collect_api_data() -> tuple[Any, Any, Any]:
-    """3개 API를 asyncio.gather()로 동시에 호출한다."""
-
     async with httpx.AsyncClient(
         timeout=15.0,
         follow_redirects=True,
@@ -77,9 +75,8 @@ async def collect_api_data() -> tuple[Any, Any, Any]:
 # Pydantic 검증
 # --------------------------------------------------
 
+# Open-Meteo 응답을 시간대별 WeatherRecord로 변환한다.
 def validate_weather(data: dict[str, Any]) -> list[WeatherRecord]:
-    """Open-Meteo 응답을 시간대별 WeatherRecord로 변환한다."""
-
     hourly = data["hourly"]
 
     times = hourly["time"]
@@ -101,9 +98,8 @@ def validate_weather(data: dict[str, Any]) -> list[WeatherRecord]:
     ]
 
 
-def validate_country(data: Any) -> CountryRecord:
-    """countries.dev 응답에서 필요한 필드를 추출하고 검증한다."""
-
+# countries.dev 응답에서 필요한 필드를 추출하고 검증한다.
+def validate_country(data: dict[str, Any]) -> CountryRecord:
     return CountryRecord(
         name=data["name"],
         capital=data["capital"],
@@ -112,9 +108,8 @@ def validate_country(data: Any) -> CountryRecord:
     )
 
 
+# ip-api 응답에서 필요한 필드를 추출하고 검증한다.
 def validate_ip(data: dict[str, Any]) -> IPRecord:
-    """ip-api 응답에서 필요한 필드를 추출하고 검증한다."""
-
     return IPRecord(
         status=data["status"],
         query=data["query"],
@@ -126,41 +121,29 @@ def validate_ip(data: dict[str, Any]) -> IPRecord:
     )
 
 
+# 세 API의 응답을 검증하고 하나의 딕셔너리 리스트로 만든다.
 def validate_all_data(
     weather_data: dict[str, Any],
-    country_data: list[dict[str, Any]],
+    country_data: dict[str, Any],
     ip_data: dict[str, Any],
 ) -> list[dict[str, Any]]:
-    """세 API의 응답을 검증하고 하나의 딕셔너리 리스트로 만든다."""
-
     weather_records = validate_weather(weather_data)
     country_record = validate_country(country_data)
     ip_record = validate_ip(ip_data)
 
-    validated_records = [
-        record.model_dump(mode="json")
-        for record in weather_records
-    ]
+    all_records = [*weather_records, country_record, ip_record]
 
-    validated_records.append(
-        country_record.model_dump(mode="json")
-    )
-    validated_records.append(
-        ip_record.model_dump(mode="json")
-    )
-
-    return validated_records
+    return [record.model_dump(mode="json") for record in all_records]
 
 
 # --------------------------------------------------
 # CSV·Parquet 저장 및 성능 측정
 # --------------------------------------------------
 
+# CSV와 Parquet의 저장 시간을 측정한다.
 def measure_write_time(
     dataframe: pd.DataFrame,
 ) -> tuple[float, float]:
-    """CSV와 Parquet의 저장 시간을 측정한다."""
-
     csv_start = time.perf_counter()
     dataframe.to_csv(
         CSV_FILE,
@@ -179,9 +162,8 @@ def measure_write_time(
     return csv_write_time, parquet_write_time
 
 
+# CSV와 Parquet의 재로딩 시간을 측정한다.
 def measure_read_time() -> tuple[pd.DataFrame, pd.DataFrame, float, float]:
-    """CSV와 Parquet의 재로딩 시간을 측정한다."""
-
     csv_start = time.perf_counter()
     csv_reloaded = pd.read_csv(CSV_FILE)
     csv_read_time = time.perf_counter() - csv_start
@@ -202,9 +184,8 @@ def measure_read_time() -> tuple[pd.DataFrame, pd.DataFrame, float, float]:
 # 프로그램 실행
 # --------------------------------------------------
 
+# 데이터 수집부터 검증, 저장, 성능 비교까지 실행한다.
 async def main() -> None:
-    """데이터 수집부터 검증, 저장, 성능 비교까지 실행한다."""
-
     OUTPUT_DIR.mkdir(exist_ok=True)
 
     try:
