@@ -46,7 +46,7 @@ PARQUET_FILE = OUTPUT_DIR / "collected_data.parquet"
 # API 호출
 # --------------------------------------------------
 
-# 지정한 API를 호출하고 JSON 응답을 반환한다.
+# 지정한 API 호출, JSON 응답 반환
 async def fetch_json(
     client: httpx.AsyncClient,
     url: str,
@@ -56,7 +56,7 @@ async def fetch_json(
     return response.json()
 
 
-# 3개 API를 asyncio.gather()로 동시에 호출한다.
+# 3개 API를 asyncio.gather()로 동시호출
 async def collect_api_data() -> tuple[Any, Any, Any]:
     async with httpx.AsyncClient(
         timeout=15.0,
@@ -75,7 +75,7 @@ async def collect_api_data() -> tuple[Any, Any, Any]:
 # Pydantic 검증
 # --------------------------------------------------
 
-# Open-Meteo 응답을 시간대별 WeatherRecord로 변환한다.
+# Open-Meteo 응답을 시간대별 WeatherRecord로 변환
 def validate_weather(data: dict[str, Any]) -> list[WeatherRecord]:
     hourly = data["hourly"]
 
@@ -98,7 +98,7 @@ def validate_weather(data: dict[str, Any]) -> list[WeatherRecord]:
     ]
 
 
-# countries.dev 응답에서 필요한 필드를 추출하고 검증한다.
+# countries.dev 응답에서 필요한 필드 추출 후 검증
 def validate_country(data: dict[str, Any]) -> CountryRecord:
     return CountryRecord(
         name=data["name"],
@@ -108,7 +108,7 @@ def validate_country(data: dict[str, Any]) -> CountryRecord:
     )
 
 
-# ip-api 응답에서 필요한 필드를 추출하고 검증한다.
+# ip-api 응답에서 필요한 필드 추출 후 검증
 def validate_ip(data: dict[str, Any]) -> IPRecord:
     return IPRecord(
         status=data["status"],
@@ -121,7 +121,7 @@ def validate_ip(data: dict[str, Any]) -> IPRecord:
     )
 
 
-# 세 API의 응답을 검증하고 하나의 딕셔너리 리스트로 만든다.
+# 세 API의 응답 검증, 하나의 딕셔너리 리스트로 생성
 def validate_all_data(
     weather_data: dict[str, Any],
     country_data: dict[str, Any],
@@ -140,7 +140,7 @@ def validate_all_data(
 # CSV·Parquet 저장 및 성능 측정
 # --------------------------------------------------
 
-# CSV와 Parquet의 저장 시간을 측정한다.
+# CSV와 Parquet의 저장 시간 측정
 def measure_write_time(
     dataframe: pd.DataFrame,
 ) -> tuple[float, float]:
@@ -162,7 +162,7 @@ def measure_write_time(
     return csv_write_time, parquet_write_time
 
 
-# CSV와 Parquet의 재로딩 시간을 측정한다.
+# CSV와 Parquet의 재로딩 시간 측정
 def measure_read_time() -> tuple[pd.DataFrame, pd.DataFrame, float, float]:
     csv_start = time.perf_counter()
     csv_reloaded = pd.read_csv(CSV_FILE)
@@ -184,7 +184,7 @@ def measure_read_time() -> tuple[pd.DataFrame, pd.DataFrame, float, float]:
 # 프로그램 실행
 # --------------------------------------------------
 
-# 데이터 수집부터 검증, 저장, 성능 비교까지 실행한다.
+# 데이터 수집, 검증, 저장, 성능비교를 실행
 async def main() -> None:
     OUTPUT_DIR.mkdir(exist_ok=True)
 
@@ -215,7 +215,7 @@ async def main() -> None:
             parquet_read,
         ) = measure_read_time()
 
-        # 저장 전후 데이터 건수가 동일한지 확인한다.
+        # 저장 전후 데이터 건수가 동일한지 확인
         assert len(csv_reloaded) == len(dataframe)
         assert len(parquet_reloaded) == len(dataframe)
 
