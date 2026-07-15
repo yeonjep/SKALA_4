@@ -16,9 +16,7 @@ import json
 import logging
 from pathlib import Path
 from typing import Any
-
 from pydantic import BaseModel, Field, ValidationError, field_validator
-
 
 # --------------------------------------------------
 # 기본 설정
@@ -134,7 +132,7 @@ def create_raw_data(
     원본 sales 데이터로 검증용 데이터 7건 생성
 
     정상 데이터 4건 + 오류 데이터 3건
-    -> Pydantic 검증 성공 및 실패 상황을 확인
+    -> Pydantic 검증 성공 및 실패 상황 확인
     """
 
     # 원본 데이터의 앞 4건을 정상 데이터로 사용
@@ -225,11 +223,14 @@ def validate_records(
 # 4. 결과 파일 저장
 # --------------------------------------------------
 
+
+"""검증 통과 -> CSV 파일로 저장"""
+
 def save_valid_records(
     records: list[SalesRecord],
     file_path: Path,
 ) -> None:
-    """검증 통과 -> CSV 파일로 저장"""
+   
 
     field_names = [
         "month",
@@ -257,11 +258,13 @@ def save_valid_records(
     logger.info("유효 데이터 저장 완료: %s", file_path)
 
 
+"""검증 실패 -> JSON 파일로 저장"""
+
 def save_errors(
     errors: list[dict[str, Any]],
     file_path: Path,
 ) -> None:
-    """검증 실패 -> JSON 파일로 저장"""
+    
 
     with open(file_path, "w", encoding="utf-8") as file:
         json.dump(
@@ -278,10 +281,10 @@ def save_errors(
 # 저장된 CSV 재로딩
 # --------------------------------------------------
 
+"""저장된 CSV를 다시 읽어 딕셔너리 리스트로 반환"""
 def reload_valid_records(
     file_path: Path,
 ) -> list[dict[str, str]]:
-    """저장된 CSV를 다시 읽어 딕셔너리 리스트로 반환"""
 
     with open(file_path, "r", encoding="utf-8") as file:
         reader = csv.DictReader(file)
@@ -293,6 +296,7 @@ def reload_valid_records(
 # --------------------------------------------------
 
 def main() -> None:
+
     """데이터 로딩 -> 검증 -> 저장 및 재로딩"""
 
     sales = safe_load_csv(DATA_FILE)
