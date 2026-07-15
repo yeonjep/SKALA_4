@@ -1,4 +1,5 @@
 """
+
 [실습 1] 자료구조 집계 · 컴프리헨션 · 제너레이터
 
 Python_Practice1_Data.json의 sales 데이터를 활용하여
@@ -8,14 +9,15 @@ Python_Practice1_Data.json의 sales 데이터를 활용하여
 2. Counter와 defaultdict 활용
 3. 제너레이터와 리스트의 메모리 비교
 4. 월별·카테고리별 매출 집계
+
 """
 
 from collections import Counter, defaultdict
 import sys
 
 
-# 교수님이 제공한 데이터 파일 불러오기
-# 파일 내용이 sales = [...] 형태이므로 exec()를 사용한다.
+# Python_Practice1_Data.json 파일 불러오기
+# 파일 내용이 sales = [...] 형태이므로 exec()를 사용
 namespace = {}
 
 try:
