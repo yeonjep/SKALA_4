@@ -3,16 +3,14 @@
 
 [실습 4] 시각화 4종 / 통계 검정 / sklearn Pipeline
 
-실습 3(practice3.py)에서 만든 IQR 이상치 제거 로직을 그대로 재사용해서
-sales_100k.csv를 정제한 뒤,
+* 실습 3(practice3.py)에서 만든 IQR 이상치 제거 로직을 재사용하여 sales_100k.csv 정제
+
 1) 2x2 서브플롯으로 EDA 시각화 4종(히스토그램+KDE, 박스플롯, 월별 라인, 상관 히트맵)
 2) t-test(서울 vs 부산 매출 평균 차이) + 카이제곱(카테고리 x 결제수단 독립성) 통계 검정
 3) ColumnTransformer + Pipeline으로 전처리·모델을 묶어 학습/평가/저장/재로딩
 4) 지역·카테고리별 총매출 Plotly 인터랙티브 막대 차트를 HTML로 저장
 을 수행한다.
 
-변경내역
-- 2026-07-16 최초 작성
 """
 
 from pathlib import Path
@@ -30,10 +28,10 @@ from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 
-# 실습 3의 IQR 정제 로직·상수를 그대로 재사용 (실습 3→4 연계)
+# 실습 3의 IQR 정제 로직 재사용 
 from practice3 import AMOUNT_COLUMN, CSV_FILE, GROUP_COLUMNS, compute_iqr_bounds, filter_outliers
 
-# matplotlib/seaborn 그래프에서 한글이 깨지지 않도록 macOS 기본 한글 폰트 지정
+# macOS 기본 한글 폰트 지정(그래프에서 깨지지 않도록)
 plt.rcParams["font.family"] = "AppleGothic"
 plt.rcParams["axes.unicode_minus"] = False
 
@@ -48,7 +46,7 @@ CATEGORICAL_FEATURES = ["region", "category", "payment_method", "customer_gender
 SIGNIFICANCE_LEVEL = 0.05
 
 
-# 실습 3과 동일한 방식(IQR)으로 이상치를 제거한 데이터를 불러온다.
+# 실습 3의 IQR 방식으로 이상치 제거한 데이터 생성
 def load_cleaned_data(path: Path) -> pd.DataFrame:
     df = pd.read_csv(path, encoding="utf-8-sig")
     lower_bound, upper_bound = compute_iqr_bounds(df, AMOUNT_COLUMN)
@@ -56,7 +54,7 @@ def load_cleaned_data(path: Path) -> pd.DataFrame:
     return filter_outliers(df, AMOUNT_COLUMN, lower_bound, upper_bound)
 
 
-# 2x2 서브플롯 하나에 EDA 시각화 4종을 그려서 파일로 저장한다.
+# 2x2 서브플롯 하나에 EDA 시각화 4종을 그려서 파일로 저장
 def plot_eda_charts(df: pd.DataFrame, output_path: Path) -> None:
     fig, axes = plt.subplots(2, 2, figsize=(14, 10))
 
@@ -91,7 +89,7 @@ def plot_eda_charts(df: pd.DataFrame, output_path: Path) -> None:
     plt.close(fig)
 
 
-# 서울 vs 부산의 평균 매출 차이를 t-test로 검정하고 통계량·p-value·해석을 반환한다.
+# 서울 vs 부산의 평균 매출 차이를 t-test로 검정하고 통계량·p-value·해석 반환
 def run_ttest_seoul_busan(df: pd.DataFrame) -> tuple[float, float, str]:
     seoul_amount = df.loc[df["region"] == "서울", AMOUNT_COLUMN].dropna()
     busan_amount = df.loc[df["region"] == "부산", AMOUNT_COLUMN].dropna()
@@ -107,7 +105,7 @@ def run_ttest_seoul_busan(df: pd.DataFrame) -> tuple[float, float, str]:
     return t_stat, p_value, interpretation
 
 
-# 카테고리와 결제수단의 독립성을 카이제곱 검정으로 확인하고 통계량·p-value·해석을 반환한다.
+# 카테고리와 결제수단의 독립성을 카이제곱 검정으로 확인하고 통계량·p-value·해석 반환
 def run_chi2_category_payment(df: pd.DataFrame) -> tuple[float, float, str]:
     contingency_table = pd.crosstab(df["category"], df["payment_method"])
     chi2_stat, p_value, _, _ = chi2_contingency(contingency_table)
@@ -121,7 +119,7 @@ def run_chi2_category_payment(df: pd.DataFrame) -> tuple[float, float, str]:
     return chi2_stat, p_value, interpretation
 
 
-# 수치형/범주형 전처리를 묶은 ColumnTransformer 기반 Pipeline을 만든다.
+# 수치형/범주형 전처리를 묶은 ColumnTransformer 기반 Pipeline 생성
 def build_pipeline() -> Pipeline:
     numeric_transformer = Pipeline(
         steps=[
@@ -152,7 +150,7 @@ def build_pipeline() -> Pipeline:
     )
 
 
-# Pipeline을 학습·평가하고, joblib으로 저장한 뒤 다시 불러와 재현되는지 확인한다.
+# Pipeline을 학습&평가, joblib으로 저장 후 다시 불러와 재현되는지 확인
 def train_evaluate_save_reload(df: pd.DataFrame, model_path: Path) -> None:
     features = df[NUMERIC_FEATURES + CATEGORICAL_FEATURES]
     target = df[AMOUNT_COLUMN]
@@ -178,7 +176,7 @@ def train_evaluate_save_reload(df: pd.DataFrame, model_path: Path) -> None:
     print(f"재로딩한 모델의 평가 데이터 R² 점수: {reloaded_score:.4f} (원본과 동일해야 정상)")
 
 
-# 지역·카테고리별 총매출을 Plotly 인터랙티브 막대 차트로 만들어 HTML로 저장한다.
+# 지역·카테고리별 총매출을 Plotly 인터랙티브 막대 차트로 만들어 HTML로 저장
 def create_plotly_chart(df: pd.DataFrame, output_path: Path) -> None:
     summary = (
         df.groupby(GROUP_COLUMNS)[AMOUNT_COLUMN]
@@ -200,7 +198,7 @@ def create_plotly_chart(df: pd.DataFrame, output_path: Path) -> None:
     print(f"Plotly 차트 저장 완료: {output_path}")
 
 
-# EDA 시각화, 통계 검정, Pipeline 학습, Plotly 차트까지 순서대로 실행한다.
+# EDA 시각화, 통계 검정, Pipeline 학습, Plotly 차트 실행
 def main() -> None:
     try:
         OUTPUT_DIR.mkdir(exist_ok=True)
