@@ -1,20 +1,18 @@
-# 울산_4반_박연제_practice 3번
-#
-# [실습 3] Pandas EDA / Polars Lazy / DuckDB SQL 비교
-#
-# sales_100k.csv를 대상으로
-# 1) Pandas 기초 EDA + IQR 이상치 처리
-# 2) Pandas groupby named aggregation (region/category별 총매출/평균/건수)
-# 3) Polars Lazy API로 동일 집계
-# 4) DuckDB SQL로 동일 집계 + 세 도구 성능(timeit) 비교
-# 를 수행한다.
-#
-# 변경내역
-# - 2026-07-16 최초 작성
+"""
+울산_4반_박연제_practice 3번
+
+[실습 3] Pandas EDA / Polars Lazy / DuckDB SQL 비교
+
+sales_100k.csv를 대상으로
+1) Pandas 기초 EDA + IQR 이상치 처리
+2) Pandas groupby named aggregation (region/category별 총매출/평균/건수)
+3) Polars Lazy API로 동일 집계
+4) DuckDB SQL로 동일 집계 + 세 도구 성능(timeit) 비교를 수행한다.
+"""
+
 
 import timeit
 from pathlib import Path
-
 import duckdb
 import pandas as pd
 import polars as pl
