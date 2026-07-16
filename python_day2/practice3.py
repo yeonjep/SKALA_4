@@ -26,7 +26,7 @@ REQUIRED_COLUMNS = {AMOUNT_COLUMN, *GROUP_COLUMNS}
 TIMEIT_REPEAT = 3
 
 
-# CSV 로딩하고 기본 구조·결측치를 출력
+# CSV 로딩하고 기본 구조·결측치 출력
 def explore_data(path: Path) -> pd.DataFrame:
     df = pd.read_csv(path, encoding="utf-8-sig")
 
