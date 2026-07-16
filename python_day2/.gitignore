@@ -1,0 +1,7 @@
+.venv/
+__pycache__/
+.pytest_cache/
+.ruff_cache/
+CACHEDIR.TAG
+*.pyc
+.DS_Store
