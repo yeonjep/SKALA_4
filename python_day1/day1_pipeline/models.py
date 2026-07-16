@@ -8,22 +8,20 @@ Day 1 데이터 수집 파이프라인에서 사용하는 Pydantic 모델
 
 from datetime import datetime
 from typing import Literal
-
 from pydantic import BaseModel, Field
 
-
+# Open-Meteo의 시간대별 날씨 데이터를 검증
 class WeatherRecord(BaseModel):
-    """Open-Meteo의 시간대별 날씨 데이터를 검증한다."""
-
+    
     source: Literal["weather"] = "weather"
     time: datetime
     temperature: float = Field(ge=-100, le=70)
     precipitation_probability: float = Field(ge=0, le=100)
 
 
+# RestCountries의 국가 정보를 검증
 class CountryRecord(BaseModel):
-    """RestCountries의 국가 정보를 검증한다."""
-
+    
     source: Literal["country"] = "country"
     name: str = Field(min_length=1)
     capital: str = Field(min_length=1)
@@ -31,9 +29,9 @@ class CountryRecord(BaseModel):
     region: str = Field(min_length=1)
 
 
+# ip-api의 IP 기반 지역 정보를 검증
 class IPRecord(BaseModel):
-    """ip-api의 IP 기반 지역 정보를 검증한다."""
-
+    
     source: Literal["ip"] = "ip"
     status: Literal["success"]
     query: str = Field(min_length=1)
