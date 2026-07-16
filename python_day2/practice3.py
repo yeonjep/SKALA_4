@@ -26,12 +26,12 @@ REQUIRED_COLUMNS = {AMOUNT_COLUMN, *GROUP_COLUMNS}
 TIMEIT_REPEAT = 3
 
 
-# CSV를 로딩하고 기본 구조·결측치를 출력한다.
+# CSV 로딩하고 기본 구조·결측치를 출력
 def explore_data(path: Path) -> pd.DataFrame:
     df = pd.read_csv(path, encoding="utf-8-sig")
 
     print("[1] 데이터 구조")
-    df.info()
+    df.info() # 컬럼별 타입·행 수
 
     print("\n[1] 컬럼별 결측치 개수")
     print(df.isnull().sum())
@@ -39,7 +39,7 @@ def explore_data(path: Path) -> pd.DataFrame:
     return df
 
 
-# 집계에 필요한 컬럼이 모두 있는지 검증한다.
+# 집계에 필요한 컬럼이 모두 있는지 검증
 def validate_columns(df: pd.DataFrame) -> None:
     missing = REQUIRED_COLUMNS - set(df.columns)
 
@@ -47,7 +47,7 @@ def validate_columns(df: pd.DataFrame) -> None:
         raise KeyError(f"필수 컬럼 누락: {missing}")
 
 
-# IQR 방법으로 이상치 정상 범위(하한, 상한)를 계산한다.
+# IQR 방법으로 이상치 정상 범위(하한/상한)를 계산
 def compute_iqr_bounds(df: pd.DataFrame, column: str) -> tuple[float, float]:
     q1 = df[column].quantile(0.25)
     q3 = df[column].quantile(0.75)
@@ -56,7 +56,7 @@ def compute_iqr_bounds(df: pd.DataFrame, column: str) -> tuple[float, float]:
     return q1 - 1.5 * iqr, q3 + 1.5 * iqr
 
 
-# IQR 정상 범위를 벗어난 행을 제거한다.
+# IQR 정상 범위를 벗어난 행을 제거
 def filter_outliers(
     df: pd.DataFrame,
     column: str,
@@ -66,7 +66,7 @@ def filter_outliers(
     return df[df[column].between(lower_bound, upper_bound)]
 
 
-# Pandas로 CSV를 읽어 이상치를 제거하고 region·category별 named aggregation을 수행한다.
+# Pandas로 CSV를 읽어 이상치를 제거 후 region·category별 named aggregation을 수행
 def pandas_pipeline(
     path: Path,
     lower_bound: float,
@@ -87,7 +87,7 @@ def pandas_pipeline(
     )
 
 
-# Polars Lazy API로 Pandas와 동일한 집계를 수행한다.
+# Polars Lazy API로 Pandas와 동일한 집계를 수행
 def polars_pipeline(
     path: Path,
     lower_bound: float,
@@ -107,7 +107,7 @@ def polars_pipeline(
     )
 
 
-# DuckDB SQL로 Pandas와 동일한 집계를 수행한다.
+# DuckDB SQL로 Pandas와 동일한 집계를 수행
 def duckdb_pipeline(
     path: Path,
     lower_bound: float,
@@ -129,7 +129,7 @@ def duckdb_pipeline(
     return duckdb.sql(query).df()
 
 
-# 세 도구의 실행 시간을 동일 조건(timeit, 3회 반복)으로 측정하고 평균을 비교한다.
+# 세 도구의 실행 시간을 동일 조건(timeit, 3회 반복)으로 측정하고 평균을 비교
 def compare_performance(
     path: Path,
     lower_bound: float,
@@ -147,34 +147,45 @@ def compare_performance(
     }
 
 
-# 데이터 탐색부터 세 도구 집계, 성능 비교까지 실행한다.
+# 데이터 탐색, 세 도구 집계, 성능 비교 
 def main() -> None:
     try:
+        
+        # CSV 로딩 + 기본 EDA
         df = explore_data(CSV_FILE)
+        # 집계에 필요한 컬럼 모두 있는지 검증 
         validate_columns(df)
 
+        # IQR 방식으로 하한, 상한 계산 
         lower_bound, upper_bound = compute_iqr_bounds(df, AMOUNT_COLUMN)
+        # 정상범위만 남긴 데이터 
         cleaned_df = filter_outliers(df, AMOUNT_COLUMN, lower_bound, upper_bound)
 
+        # 이상치 제거 후 출력 
         print(f"\n[1] IQR 이상치 범위: [{lower_bound:.2f}, {upper_bound:.2f}]")
         print(f"[1] 이상치 제거 전 행 수: {len(df)}")
         print(f"[1] 이상치 제거 후 행 수: {len(cleaned_df)}")
         print(f"[1] 제거된 이상치 수: {len(df) - len(cleaned_df)}")
 
+        # 1) Pandas
         print("\n[2] Pandas named aggregation 결과 (총매출 내림차순, 상위 10건)")
         pandas_result = pandas_pipeline(CSV_FILE, lower_bound, upper_bound)
         print(pandas_result.head(10))
 
+        # 2) Polars
         print("\n[3] Polars Lazy API 집계 결과 (상위 10건)")
         polars_result = polars_pipeline(CSV_FILE, lower_bound, upper_bound)
         print(polars_result.head(10))
 
+        # 3) DuckDB
         print("\n[4] DuckDB SQL 집계 결과 (상위 10건)")
         duckdb_result = duckdb_pipeline(CSV_FILE, lower_bound, upper_bound)
         print(duckdb_result.head(10))
 
+        # 세 도구 동일 조건 비교, 3회 반복 평균 시간 계산 
         print(f"\n[4] 성능 비교 (timeit {TIMEIT_REPEAT}회 반복 평균)")
         averages = compare_performance(CSV_FILE, lower_bound, upper_bound)
+        # 평균 소요시간 짧은 결과부터 출력 
         for tool, avg_time in sorted(averages.items(), key=lambda item: item[1]):
             print(f"{tool}: 평균 {avg_time:.4f}초")
 
