@@ -3,6 +3,7 @@
 
 Python_Practice1_Data.json의 sales 데이터를 활용하여 다음 작업을 수행한다.
 
+
 1. amount가 1000 이상인 거래 필터링
 2. 지역별 총매출 계산
 3. Counter를 활용한 지역별 거래 건수 계산
