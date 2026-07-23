@@ -1,0 +1,203 @@
+/* 1. 변수와 초기화 */
+
+:root {
+  --color-brand: #ea002c;
+  --color-text: #333;
+  --color-muted: #777;
+  --color-border: #ddd;
+  --color-background: #f6f6f8;
+
+  --space: 16px;
+  --radius: 10px;
+}
+
+/*   2. 기본 초기화   */
+* {
+  box-sizing: border-box;
+}
+.panel {
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: var(--radius);
+  padding: var(--space);
+}
+body {
+  margin: 0;
+  min-height: 100vh;
+
+  font-family: system-ui, sans-serif;
+  color: var(--color-text);
+  background-color: var(--color-background);
+}
+/* 3. 상단 영역 */
+.header {
+  padding: 24px 28px 20px;
+
+  background-color: white;
+  border-bottom: 3px solid var(--color-brand);
+}
+.logo {
+  margin: 0 0 6px;
+  font-size: 24px;
+}
+
+.today {
+  margin: 0;
+  color: var(--color-muted);
+  font-size: 14px;
+}
+
+/* 4. 가운데 전체 콘텐츠 */
+.container {
+  width: 100%;
+  max-width: 780px;
+  margin: 28px auto;
+  padding: 0 16px;
+}
+
+/* 5. 각 흰색 박스 */
+.panel {
+  margin-bottom: 2px;
+  padding: 24px;
+  background-color: white;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+}
+
+.panel-title {
+  margin: 0 0 20px;
+  font-size: 18px;
+}
+
+/*  목표 입력 폼  */
+.form {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.form label {
+  font-weight: 600;
+}
+/* 6. 목표 입력 폼 */
+.form {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.form label {
+  font-weight: 600;
+}
+
+.form input,
+.form select {
+  height: 42px;
+  padding: 0 12px;
+  background-color: white;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  font-size: 15px;
+}
+
+.form input {
+  flex: 1;
+  min-width: 0;
+}
+
+.form select {
+  width: 140px;
+}
+
+/* 7. 추가 버튼 */
+.btn-primary {
+  height: 42px;
+  padding: 0 20px;
+  color: white;
+  background-color: var(--color-brand);
+  border: 0;
+  border-radius: var(--radius);
+  font-size: 15px;
+  cursor: pointer;
+  transition:
+    transform 0.15s,
+    opacity 0.15s;
+}
+
+.btn-primary:hover {
+  opacity: 0.9;
+  transform: translateY(-2px);
+}
+
+/* 8. 학습 목록 제목과 탭 */
+.panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px;
+}
+
+.tabs {
+  display: flex;
+  gap: 4px;
+}
+
+.tab {
+  padding: 5px 10px;
+  background-color: #f3f3f3;
+  border: 1px solid #999;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.tab.is-active {
+  color: white;
+  background-color: var(--color-brand);
+
+  border-color: var(--color-brand);
+}
+
+/* 9. 배지 */
+.badge {
+  display: inline-block;
+  padding: 3px 8px;
+  color: var(--color-brand);
+  background-color: #ffe8ed;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* 10. 문단 간격 */
+.panel p {
+  margin: 14px 0;
+}
+
+/* 11. 푸터 */
+.footer {
+  width: 100%;
+  max-width: 780px;
+  margin: 30px auto 0;
+  padding: 0 16px 20px;
+  font-size: 14px;
+}
+
+/* 12. 화면이 좁을 때 */
+@media (max-width: 600px) {
+  .form {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .form input,
+  .form select,
+  .btn-primary {
+    width: 100%;
+  }
+
+  .panel-header {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 12px;
+  }
+}
