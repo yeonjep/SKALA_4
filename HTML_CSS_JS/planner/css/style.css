@@ -354,3 +354,9 @@ body {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* 19. 완료된 목표 표시 */
+.item.is-done .item-text {
+  color: var(--color-muted);
+  text-decoration: line-through;
+}
