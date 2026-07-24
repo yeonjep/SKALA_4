@@ -13,6 +13,7 @@ const sortEl = document.getElementById("sort-controls");
 const progressFillEl = document.getElementById("progress-fill");
 const progressTextEl = document.getElementById("progress-text");
 const summaryEl = document.getElementById("category-summary");
+const tipEl = document.getElementById("tip-text");
 
 const themeToggleEl = document.getElementById("theme-toggle");
 
@@ -313,3 +314,24 @@ if (todayEl) {
 // ===== 17. 초기 실행 =====
 loadTheme();
 render();
+loadTip();
+
+// ===== 18. 오늘의 팁 (fetch) =====
+async function loadTip() {
+  try {
+    const response = await fetch("data/tips.json");
+
+    if (!response.ok) {
+      throw new Error("팁 데이터를 불러오지 못했습니다.");
+    }
+
+    const tips = await response.json();
+    const random = tips[Math.floor(Math.random() * tips.length)];
+
+    tipEl.textContent = `[${random.category}] ${random.tip}`;
+  } catch (err) {
+    tipEl.textContent =
+      "오늘의 팁을 불러오지 못했어요. Live Server로 열었는지 확인해주세요.";
+    console.error(err);
+  }
+}

@@ -1,0 +1,42 @@
+[
+  {
+    "category": "HTML",
+    "tip": "태그는 '보기 좋게'가 아니라 '의미대로' 고르세요. 굵게 보이고 싶다고 무조건 <b>가 아니라, 정말 중요한 내용이면 <strong>을 씁니다."
+  },
+  {
+    "category": "HTML",
+    "tip": "label의 for 속성과 input의 id를 반드시 연결하세요. placeholder는 label을 대신할 수 없습니다."
+  },
+  {
+    "category": "CSS",
+    "tip": "box-sizing: border-box를 프로젝트 첫 줄에 넣는 습관을 들이면, width에 padding·border가 포함돼서 레이아웃 계산이 훨씬 편해집니다."
+  },
+  {
+    "category": "CSS",
+    "tip": "한 줄로 나열하고 싶으면 Flexbox, 격자로 배치하고 싶으면 Grid. 둘은 경쟁 관계가 아니라 함께 쓰는 도구입니다."
+  },
+  {
+    "category": "CSS",
+    "tip": "가로 스크롤이 생기면 개발자도구로 어떤 요소가 폭을 밀어내는지부터 확인하세요. flex/grid 아이템은 min-width: 0을 안 주면 안 줄어듭니다."
+  },
+  {
+    "category": "JS",
+    "tip": "변수는 기본적으로 const를 쓰고, 값이 바뀔 때만 let을 쓰세요. var는 되도록 쓰지 않습니다."
+  },
+  {
+    "category": "JS",
+    "tip": "비교는 항상 ===를 쓰세요. ==는 타입을 자동으로 바꿔서 비교하기 때문에 예상 못 한 결과가 나올 수 있습니다."
+  },
+  {
+    "category": "JS",
+    "tip": "요소가 100개든 1000개든, 부모에 이벤트 리스너 하나만 걸고 event.target으로 판별하는 이벤트 위임을 쓰면 성능과 코드 모두 깔끔해집니다."
+  },
+  {
+    "category": "JS",
+    "tip": "fetch는 file://에서 동작하지 않습니다. 반드시 Live Server(http://)로 열어서 테스트하세요."
+  },
+  {
+    "category": "JS",
+    "tip": "콘솔에 빨간 오류가 뜨면 당황하지 말고 '오류 타입 → 메시지 → 파일:줄번호' 순서로 읽으세요. Cannot read properties of null은 대부분 id 오타나 실행 시점 문제입니다."
+  }
+]
