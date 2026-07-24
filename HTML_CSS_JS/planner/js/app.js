@@ -1,132 +1,202 @@
 // ===== 1. 요소 선택 =====
-const form = document.getElementById("goal-form");
-const input = document.getElementById("goal-input");
-const category = document.getElementById("goal-category");
+const formEl = document.getElementById("goal-form");
+const titleInput = document.getElementById("goal-title");
+const categorySelect = document.getElementById("goal-category");
+const dueInput = document.getElementById("goal-due");
+const searchInput = document.getElementById("goal-search");
+
 const listEl = document.getElementById("goal-list");
 const emptyEl = document.getElementById("list-empty");
-const errorEl = document.getElementById("form-error");
 const tabsEl = document.getElementById("filter-tabs");
-const fillEl = document.getElementById("progress-fill");
-const textEl = document.getElementById("progress-text");
 
-document.getElementById("today").textContent = new Date().toLocaleDateString(
-  "ko-KR",
-  { dateStyle: "long" },
-);
+const progressFillEl = document.getElementById("progress-fill");
+const progressTextEl = document.getElementById("progress-text");
+const summaryEl = document.getElementById("category-summary");
 
-// ===== 2. 상태와 저장 =====
-const STORAGE_KEY = "skala-planner"; // 플래너 데이터를 저장할 때 사용할 key 값 설정
+// ===== 2. 상태 =====
+const STORAGE_KEY = "skala-planner-goals";
 let goals = load();
-let filter = "all";
+let filter = "all"; // all | active | done
 
 function load() {
-  const saved = localStorage.getItem(STORAGE_KEY);
-  return saved ? JSON.parse(saved) : [];
+  const raw = localStorage.getItem(STORAGE_KEY);
+  if (!raw) return [];
+  try {
+    return JSON.parse(raw);
+  } catch (e) {
+    return [];
+  }
 }
 
 function save() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(goals));
 }
 
-// ===== 4. 목표 추가 =====
-form.addEventListener("submit", (event) => {
-  event.preventDefault();
-  const title = input.value.trim();
+// ===== 3. 목표 추가 (폼 제출) =====
+formEl.addEventListener("submit", function (e) {
+  e.preventDefault();
 
-  if (title === "") {
-    errorEl.hidden = false;
-    input.focus();
+  const title = titleInput.value.trim();
+  const due = dueInput.value;
+
+  // 제목 또는 마감일이 비어 있으면 추가하지 않음
+  if (!title || !due) {
+    formEl.reportValidity();
     return;
   }
-  errorEl.hidden = true;
 
   goals.push({
     id: Date.now(),
     title: title,
-    category: category.value,
+    category: categorySelect.value,
+    due: due,
     done: false,
   });
 
-  input.value = "";
   save();
   render();
+
+  titleInput.value = "";
+  dueInput.value = "";
+  titleInput.focus();
 });
 
-// ===== 5. 완료 토글 · 삭제 (이벤트 위임) =====
-listEl.addEventListener("click", (event) => {
-  const li = event.target.closest(".item");
-  if (!li) return;
+// ===== 4. 목록 클릭 위임 (완료 토글 / 삭제) =====
+listEl.addEventListener("click", function (e) {
+  const itemEl = e.target.closest(".item");
+  if (!itemEl) return;
 
-  const id = Number(li.dataset.id);
+  const id = Number(itemEl.dataset.id);
 
-  if (event.target.matches(".item-check")) {
+  if (e.target.classList.contains("item-check")) {
     const goal = goals.find((g) => g.id === id);
-    goal.done = event.target.checked;
+    if (goal) goal.done = !goal.done;
     save();
     render();
+    return;
   }
 
-  if (event.target.matches(".item-del")) {
+  if (e.target.classList.contains("item-del")) {
     goals = goals.filter((g) => g.id !== id);
     save();
     render();
+    return;
   }
 });
 
-// ===== 6. 필터 탭 =====
-tabsEl.addEventListener("click", (event) => {
-  const tab = event.target.closest(".tab");
-  if (!tab) return;
+// ===== 5. 탭 클릭 위임 (필터 전환) =====
+tabsEl.addEventListener("click", function (e) {
+  const btn = e.target.closest(".tab");
+  if (!btn) return;
 
-  filter = tab.dataset.filter; // "all" | "active" | "done"
-  document.querySelectorAll(".tab").forEach((t) => {
-    t.classList.toggle("is-active", t === tab);
-  });
+  filter = btn.dataset.filter;
+
+  tabsEl
+    .querySelectorAll(".tab")
+    .forEach((t) => t.classList.remove("is-active"));
+  btn.classList.add("is-active");
+
   render();
 });
 
-function visible() {
-  if (filter === "active") return goals.filter((g) => !g.done);
-  if (filter === "done") return goals.filter((g) => g.done);
-  return goals;
+// ===== 6. 검색 (F6) =====
+searchInput.addEventListener("input", render);
+
+// ===== 7. 필터 + 검색 =====
+function visible(goal) {
+  const keyword = searchInput.value.trim().toLowerCase();
+
+  const matchesFilter =
+    filter === "all" ||
+    (filter === "active" && !goal.done) ||
+    (filter === "done" && goal.done);
+
+  const matchesKeyword = goal.title.toLowerCase().includes(keyword);
+
+  return matchesFilter && matchesKeyword;
 }
 
-// ===== 7. 렌더링 =====
+// ===== 8. 마감일 지남 여부 (F5) =====
+function isOverdue(goal) {
+  if (!goal.due || goal.done) return false;
+  const today = new Date().toISOString().slice(0, 10);
+  return goal.due < today;
+}
+
+// ===== 9. 렌더링 =====
 function render() {
-  const items = visible();
+  const visibleGoals = goals.filter(visible);
+
   listEl.innerHTML = "";
 
-  items.forEach((goal) => {
+  visibleGoals.forEach((goal) => {
     const li = document.createElement("li");
-    li.className = goal.done ? "item is-done" : "item";
+    li.className =
+      "item" +
+      (goal.done ? " is-done" : "") +
+      (isOverdue(goal) ? " is-overdue" : "");
     li.dataset.id = goal.id;
+
     li.innerHTML = `
       <input type="checkbox" class="item-check" ${goal.done ? "checked" : ""}>
       <span class="item-text">${escapeHtml(goal.title)}</span>
-      <span class="badge">${goal.category}</span>
-      <button type="button" class="item-del" aria-label="삭제">×</button>
+      ${goal.due ? `<span class="item-due">${goal.due}</span>` : ""}
+      <span class="item-badge">${escapeHtml(goal.category)}</span>
+      <button type="button" class="item-del" aria-label="삭제">&times;</button>
     `;
+
     listEl.appendChild(li);
   });
 
-  emptyEl.hidden = items.length > 0;
+  emptyEl.hidden = visibleGoals.length !== 0;
+
   updateProgress();
+  updateSummary();
 }
 
+// ===== 10. 진행률 (F3) =====
 function updateProgress() {
   const total = goals.length;
-  const done = goals.filter((g) => g.done).length;
-  const percent = total === 0 ? 0 : Math.round((done / total) * 100);
+  const doneCount = goals.filter((g) => g.done).length;
+  const percent = total === 0 ? 0 : Math.round((doneCount / total) * 100);
 
-  fillEl.style.width = percent + "%";
-  textEl.textContent = `전체 ${total}개 중 ${done}개 완료 (${percent}%)`;
+  progressFillEl.style.width = percent + "%";
+  progressTextEl.textContent = `${doneCount} / ${total} 완료`;
 }
 
+// ===== 11. 분류별 요약 (F7) =====
+function updateSummary() {
+  const remaining = goals.filter((g) => !g.done);
+
+  const counts = remaining.reduce((acc, g) => {
+    acc[g.category] = (acc[g.category] || 0) + 1;
+    return acc;
+  }, {});
+
+  const parts = Object.keys(counts).map((cat) => `${cat} ${counts[cat]}개`);
+
+  summaryEl.textContent = parts.length
+    ? `남은 목표 — ${parts.join(" · ")}`
+    : "남은 목표가 없습니다.";
+}
+
+// ===== 12. XSS 방지용 이스케이프 =====
 function escapeHtml(str) {
   const div = document.createElement("div");
   div.textContent = str;
   return div.innerHTML;
 }
 
-// ===== 초기 실행 =====
+// ===== 13. 오늘 날짜 표시 =====
+const todayEl = document.getElementById("today");
+if (todayEl) {
+  todayEl.textContent = new Date().toLocaleDateString("ko-KR", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    weekday: "long",
+  });
+}
+
+// ===== 14. 초기 렌더 =====
 render();
