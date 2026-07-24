@@ -7,6 +7,7 @@
   --color-bg: #f4f4f7;
   --color-bg-subtle: #f2f2f4;
   --color-panel: #ffffff;
+  --color-brand-rgb: 224, 41, 60;
   --radius: 16px;
 }
 
@@ -19,6 +20,7 @@ body.theme-dark {
   --color-bg: #1b1b1f;
   --color-bg-subtle: #29292f;
   --color-panel: #232328;
+  --color-brand-rgb: 255, 84, 104;
 }
 
 body.theme-dark .form-input,
