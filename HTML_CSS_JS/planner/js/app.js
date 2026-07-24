@@ -8,15 +8,22 @@ const searchInput = document.getElementById("goal-search");
 const listEl = document.getElementById("goal-list");
 const emptyEl = document.getElementById("list-empty");
 const tabsEl = document.getElementById("filter-tabs");
+const sortEl = document.getElementById("sort-controls");
 
 const progressFillEl = document.getElementById("progress-fill");
 const progressTextEl = document.getElementById("progress-text");
 const summaryEl = document.getElementById("category-summary");
 
+const themeToggleEl = document.getElementById("theme-toggle");
+
 // ===== 2. 상태 =====
 const STORAGE_KEY = "skala-planner-goals";
+const THEME_KEY = "skala-planner-theme";
+
 let goals = load();
 let filter = "all"; // all | active | done
+let sortMode = "default"; // default | due | latest
+let justAddedId = null; // 방금 추가된 항목 id (등장 애니메이션용)
 
 function load() {
   const raw = localStorage.getItem(STORAGE_KEY);
@@ -39,19 +46,21 @@ formEl.addEventListener("submit", function (e) {
   const title = titleInput.value.trim();
   const due = dueInput.value;
 
-  // 제목 또는 마감일이 비어 있으면 추가하지 않음
   if (!title || !due) {
     formEl.reportValidity();
     return;
   }
 
-  goals.push({
+  const newGoal = {
     id: Date.now(),
     title: title,
     category: categorySelect.value,
     due: due,
     done: false,
-  });
+  };
+
+  goals.push(newGoal);
+  justAddedId = newGoal.id;
 
   save();
   render();
@@ -77,14 +86,60 @@ listEl.addEventListener("click", function (e) {
   }
 
   if (e.target.classList.contains("item-del")) {
-    goals = goals.filter((g) => g.id !== id);
-    save();
-    render();
+    itemEl.classList.add("item-removing");
+    itemEl.addEventListener("transitionend", function onEnd() {
+      itemEl.removeEventListener("transitionend", onEnd);
+      goals = goals.filter((g) => g.id !== id);
+      save();
+      render();
+    });
     return;
   }
 });
 
-// ===== 5. 탭 클릭 위임 (필터 전환) =====
+// ===== 5. 목표 제목 더블클릭 수정 =====
+listEl.addEventListener("dblclick", function (e) {
+  const textEl = e.target.closest(".item-text");
+  if (!textEl) return;
+
+  const itemEl = textEl.closest(".item");
+  const id = Number(itemEl.dataset.id);
+  const goal = goals.find((g) => g.id === id);
+  if (!goal) return;
+
+  const input = document.createElement("input");
+  input.type = "text";
+  input.className = "item-edit-input";
+  input.value = goal.title;
+
+  textEl.replaceWith(input);
+  input.focus();
+  input.select();
+
+  let cancelled = false;
+
+  function commit() {
+    if (cancelled) return;
+    const newTitle = input.value.trim();
+    if (newTitle) {
+      goal.title = newTitle;
+      save();
+    }
+    render();
+  }
+
+  input.addEventListener("blur", commit);
+  input.addEventListener("keydown", function (ev) {
+    if (ev.key === "Enter") {
+      input.blur();
+    } else if (ev.key === "Escape") {
+      cancelled = true;
+      render();
+    }
+  });
+});
+
+// ===== 6. 탭 클릭 위임 (필터 전환) =====
 tabsEl.addEventListener("click", function (e) {
   const btn = e.target.closest(".tab");
   if (!btn) return;
@@ -99,10 +154,41 @@ tabsEl.addEventListener("click", function (e) {
   render();
 });
 
-// ===== 6. 검색 (F6) =====
+// ===== 7. 정렬 버튼 =====
+sortEl.addEventListener("click", function (e) {
+  const btn = e.target.closest(".sort-btn");
+  if (!btn) return;
+
+  sortMode = btn.dataset.sort;
+
+  sortEl
+    .querySelectorAll(".sort-btn")
+    .forEach((b) => b.classList.remove("is-active"));
+  btn.classList.add("is-active");
+
+  render();
+});
+
+function sortGoals(list) {
+  const copy = [...list];
+
+  if (sortMode === "due") {
+    copy.sort((a, b) => {
+      if (!a.due) return 1;
+      if (!b.due) return -1;
+      return a.due.localeCompare(b.due);
+    });
+  } else if (sortMode === "latest") {
+    copy.sort((a, b) => b.id - a.id);
+  }
+
+  return copy;
+}
+
+// ===== 8. 검색 =====
 searchInput.addEventListener("input", render);
 
-// ===== 7. 필터 + 검색 =====
+// ===== 9. 필터 + 검색 =====
 function visible(goal) {
   const keyword = searchInput.value.trim().toLowerCase();
 
@@ -116,16 +202,16 @@ function visible(goal) {
   return matchesFilter && matchesKeyword;
 }
 
-// ===== 8. 마감일 지남 여부 (F5) =====
+// ===== 10. 마감일 지남 여부 =====
 function isOverdue(goal) {
   if (!goal.due || goal.done) return false;
   const today = new Date().toISOString().slice(0, 10);
   return goal.due < today;
 }
 
-// ===== 9. 렌더링 =====
+// ===== 11. 렌더링 =====
 function render() {
-  const visibleGoals = goals.filter(visible);
+  const visibleGoals = sortGoals(goals.filter(visible));
 
   listEl.innerHTML = "";
 
@@ -146,6 +232,16 @@ function render() {
     `;
 
     listEl.appendChild(li);
+
+    if (goal.id === justAddedId) {
+      li.classList.add("item-new");
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          li.classList.remove("item-new");
+        });
+      });
+      justAddedId = null;
+    }
   });
 
   emptyEl.hidden = visibleGoals.length !== 0;
@@ -154,17 +250,17 @@ function render() {
   updateSummary();
 }
 
-// ===== 10. 진행률 (F3) =====
+// ===== 12. 진행률 =====
 function updateProgress() {
   const total = goals.length;
   const doneCount = goals.filter((g) => g.done).length;
   const percent = total === 0 ? 0 : Math.round((doneCount / total) * 100);
 
   progressFillEl.style.width = percent + "%";
-  progressTextEl.textContent = `${doneCount} / ${total} 완료`;
+  progressTextEl.textContent = `${doneCount} / ${total} 완료 (${percent}%)`;
 }
 
-// ===== 11. 분류별 요약 (F7) =====
+// ===== 13. 분류별 요약 =====
 function updateSummary() {
   const remaining = goals.filter((g) => !g.done);
 
@@ -180,14 +276,30 @@ function updateSummary() {
     : "남은 목표가 없습니다.";
 }
 
-// ===== 12. XSS 방지용 이스케이프 =====
+// ===== 14. XSS 방지용 이스케이프 =====
 function escapeHtml(str) {
   const div = document.createElement("div");
   div.textContent = str;
   return div.innerHTML;
 }
 
-// ===== 13. 오늘 날짜 표시 =====
+// ===== 15. 다크 모드 =====
+function loadTheme() {
+  const saved = localStorage.getItem(THEME_KEY);
+  if (saved === "dark") {
+    document.body.classList.add("theme-dark");
+    themeToggleEl.textContent = "라이트모드";
+  }
+}
+
+themeToggleEl.addEventListener("click", function () {
+  document.body.classList.toggle("theme-dark");
+  const isDark = document.body.classList.contains("theme-dark");
+  themeToggleEl.textContent = isDark ? "라이트모드" : "다크모드";
+  localStorage.setItem(THEME_KEY, isDark ? "dark" : "light");
+});
+
+// ===== 16. 오늘 날짜 표시 =====
 const todayEl = document.getElementById("today");
 if (todayEl) {
   todayEl.textContent = new Date().toLocaleDateString("ko-KR", {
@@ -198,5 +310,6 @@ if (todayEl) {
   });
 }
 
-// ===== 14. 초기 렌더 =====
+// ===== 17. 초기 실행 =====
+loadTheme();
 render();

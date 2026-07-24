@@ -10,7 +10,40 @@
   --radius: 16px;
 }
 
-/* ===== 2. 리셋 ===== */
+/* ===== 2. 다크 모드 변수 ===== */
+body.theme-dark {
+  --color-brand: #ff5468;
+  --color-text: #f0f0f2;
+  --color-muted: #9c9ca3;
+  --color-border: #3a3a40;
+  --color-bg: #1b1b1f;
+  --color-bg-subtle: #29292f;
+  --color-panel: #232328;
+}
+
+body.theme-dark .form-input,
+body.theme-dark .form-select,
+body.theme-dark .theme-toggle,
+body.theme-dark .tab,
+body.theme-dark .sort-btn {
+  background-color: #1b1b1f;
+  color: var(--color-text);
+  border-color: var(--color-border);
+}
+
+body.theme-dark .tab.is-active,
+body.theme-dark .sort-btn.is-active {
+  background-color: #f0f0f2;
+  color: #1b1b1f;
+  border-color: #f0f0f2;
+}
+
+/* 화살표*/
+body.theme-dark .form-select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%23f0f0f2' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+}
+
+/* ===== 3. 리셋 ===== */
 * {
   box-sizing: border-box;
 }
@@ -20,6 +53,9 @@ body {
   font-family: "Pretendard", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
   color: var(--color-text);
   background: var(--color-bg);
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
 }
 
 .sr-only {
@@ -31,14 +67,20 @@ body {
   white-space: nowrap;
 }
 
-/* ===== 3. 헤더 ===== */
+/* ===== 4. 헤더 ===== */
 .header {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   justify-content: space-between;
   padding: 28px 32px 16px;
   border-bottom: 3px solid var(--color-brand);
   background: var(--color-panel);
+}
+
+.header-left {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
 }
 
 .logo {
@@ -53,7 +95,23 @@ body {
   font-size: 14px;
 }
 
-/* ===== 4. 레이아웃 컨테이너 ===== */
+.theme-toggle {
+  height: 36px;
+  padding: 0 16px;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--color-text);
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.theme-toggle:hover {
+  border-color: var(--color-brand);
+  color: var(--color-brand);
+}
+
+/* ===== 5. 레이아웃 컨테이너 ===== */
 .container {
   max-width: 720px;
   margin: 0 auto;
@@ -63,7 +121,7 @@ body {
   gap: 20px;
 }
 
-/* ===== 5. 패널 ===== */
+/* ===== 6. 패널 ===== */
 .panel {
   background: var(--color-panel);
   border-radius: var(--radius);
@@ -90,7 +148,7 @@ body {
   margin: 0;
 }
 
-/* ===== 6. 폼 레이아웃 ===== */
+/* ===== 7. 폼 레이아웃 ===== */
 .form-row {
   display: flex;
   flex-wrap: wrap;
@@ -127,13 +185,21 @@ body {
 
 .form-select {
   flex: 0 0 120px;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  padding-right: 36px;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'><path d='M1 1l4 4 4-4' fill='none' stroke='%238a8a8a' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  background-size: 10px 6px;
 }
 
 .form-date {
   flex: 0 0 150px;
 }
 
-/* ===== 7. 버튼 ===== */
+/* ===== 8. 버튼 ===== */
 .btn {
   cursor: pointer;
   font-family: inherit;
@@ -155,7 +221,7 @@ body {
   filter: brightness(0.95);
 }
 
-/* ===== 8. 탭 ===== */
+/* ===== 9. 탭 ===== */
 .tabs {
   display: flex;
   gap: 8px;
@@ -178,27 +244,51 @@ body {
   color: #fff;
 }
 
-/* ===== 9. 검색창 ===== */
+/* ===== 10. 검색창 ===== */
 .search-row {
-  margin: 0 0 16px;
+  margin: 0 0 12px;
 }
 
 .search-row .form-input {
   width: 100%;
 }
 
-/* ===== 10. 목록 아이템 ===== */
+/* ===== 11. 정렬 ===== */
+.sort-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 16px;
+  flex-wrap: wrap;
+}
+
+.sort-label {
+  font-size: 12px;
+  color: var(--color-muted);
+}
+
+.sort-btn {
+  height: 30px;
+  padding: 0 12px;
+  border-radius: 999px;
+  border: 1px solid var(--color-border);
+  background: #fff;
+  color: var(--color-text);
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.sort-btn.is-active {
+  background: #2b2b2f;
+  border-color: #2b2b2f;
+  color: #fff;
+}
+
+/* ===== 12. 목록 아이템 ===== */
 .goal-list {
   list-style: none;
   margin: 0;
   padding: 0;
-}
-
-.list-empty {
-  padding: 20px 0;
-  text-align: center;
-  color: var(--color-muted);
-  font-size: 14px;
 }
 
 .item {
@@ -207,10 +297,25 @@ body {
   gap: 12px;
   padding: 14px 4px;
   border-bottom: 1px solid var(--color-border);
+  opacity: 1;
+  transform: translateY(0);
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
 }
 
 .item:last-child {
   border-bottom: none;
+}
+
+.item.item-new {
+  opacity: 0;
+  transform: translateY(-6px);
+}
+
+.item.item-removing {
+  opacity: 0;
+  transform: translateX(16px);
 }
 
 .item-check {
@@ -226,11 +331,23 @@ body {
   min-width: 0;
   word-break: break-word;
   font-size: 15px;
+  cursor: text;
 }
 
 .item.is-done .item-text {
   color: var(--color-muted);
   text-decoration: line-through;
+}
+
+.item-edit-input {
+  flex: 1;
+  min-width: 0;
+  height: 32px;
+  padding: 0 8px;
+  border: 1px solid var(--color-brand);
+  border-radius: 6px;
+  font-size: 15px;
+  font-family: inherit;
 }
 
 .item-due {
@@ -273,7 +390,26 @@ body {
   color: var(--color-brand);
 }
 
-/* ===== 11. 진행률 ===== */
+/* ===== 13. 빈 화면 안내 ===== */
+.list-empty {
+  padding: 28px 0;
+  text-align: center;
+}
+
+.list-empty-title {
+  margin: 0 0 4px;
+  color: var(--color-text);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.list-empty-desc {
+  margin: 0;
+  color: var(--color-muted);
+  font-size: 13px;
+}
+
+/* ===== 14. 진행률 ===== */
 .progress {
   margin-top: 16px;
 }
@@ -298,14 +434,14 @@ body {
   color: var(--color-muted);
 }
 
-/* ===== 12. 분류별 요약 (F7) ===== */
+/* ===== 15. 분류별 요약 ===== */
 .summary {
   margin: 10px 0 0;
   color: var(--color-muted);
   font-size: 13px;
 }
 
-/* ===== 13. 오늘의 팁 ===== */
+/* ===== 16. 오늘의 팁 ===== */
 .tip {
   margin: 0;
   color: var(--color-text);
@@ -313,7 +449,7 @@ body {
   line-height: 1.6;
 }
 
-/* ===== 14. 푸터 ===== */
+/* ===== 17. 푸터 ===== */
 .footer {
   text-align: center;
   padding: 20px;
@@ -321,10 +457,16 @@ body {
   font-size: 12px;
 }
 
-/* ===== 15. 작은 화면 ===== */
+/* ===== 18. 작은 화면 ===== */
 @media (max-width: 600px) {
   .header {
     padding: 20px 18px 14px;
+  }
+
+  .header-left {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
   }
 
   .panel {
@@ -350,7 +492,7 @@ body {
   }
 }
 
-/* ===== 16. 접근성 - 동작 줄이기 ===== */
+/* ===== 19. 접근성 - 동작 줄이기 ===== */
 @media (prefers-reduced-motion: reduce) {
   * {
     transition-duration: 0.01ms !important;

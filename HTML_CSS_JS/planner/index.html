@@ -8,8 +8,13 @@
   </head>
   <body>
     <header class="header">
-      <h1 class="logo">SKALA 스터디 플래너</h1>
-      <p class="today" id="today"></p>
+      <div class="header-left">
+        <h1 class="logo">SKALA 스터디 플래너</h1>
+        <p class="today" id="today"></p>
+      </div>
+      <button type="button" id="theme-toggle" class="theme-toggle">
+        다크모드
+      </button>
     </header>
 
     <main class="container">
@@ -24,19 +29,24 @@
               id="goal-title"
               class="form-input"
               placeholder="오늘의 학습 목표를 입력하세요"
+              autocomplete="off"
               required
             />
 
             <label for="goal-category" class="sr-only">분류</label>
             <select id="goal-category" class="form-input form-select">
-              <option value="학습">학습</option>
-              <option value="프로젝트">프로젝트</option>
-              <option value="복습">복습</option>
-              <option value="기타">기타</option>
+              <option value="HTML">HTML</option>
+              <option value="CSS">CSS</option>
+              <option value="JS">JS</option>
             </select>
 
             <label for="goal-due" class="sr-only">마감일</label>
-            <input type="date" id="goal-due" class="form-input form-date" />
+            <input
+              type="date"
+              id="goal-due"
+              class="form-input form-date"
+              required
+            />
 
             <button type="submit" class="btn btn-primary">추가</button>
           </div>
@@ -65,17 +75,35 @@
             id="goal-search"
             class="form-input"
             placeholder="목표 검색..."
+            autocomplete="off"
           />
         </div>
 
+        <div class="sort-row" id="sort-controls">
+          <span class="sort-label">정렬</span>
+          <button type="button" class="sort-btn is-active" data-sort="default">
+            기본
+          </button>
+          <button type="button" class="sort-btn" data-sort="due">
+            마감임박순
+          </button>
+          <button type="button" class="sort-btn" data-sort="latest">
+            최신순
+          </button>
+        </div>
+
         <ul id="goal-list" class="goal-list"></ul>
-        <p class="list-empty" id="list-empty" hidden>등록된 목표가 없습니다.</p>
+
+        <div class="list-empty" id="list-empty" hidden>
+          <p class="list-empty-title">아직 등록된 목표가 없어요.</p>
+          <p class="list-empty-desc">예: "HTML 시맨틱 태그 복습하기"</p>
+        </div>
 
         <div class="progress">
           <div class="progress-bar">
             <div class="progress-fill" id="progress-fill"></div>
           </div>
-          <p class="progress-text" id="progress-text">0 / 0 완료</p>
+          <p class="progress-text" id="progress-text">0 / 0 완료 (0%)</p>
         </div>
 
         <p class="summary" id="category-summary"></p>
