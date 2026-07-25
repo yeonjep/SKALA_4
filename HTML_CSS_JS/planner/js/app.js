@@ -334,7 +334,7 @@ async function loadTip() {
   }
 }
 
-// 배열을 무작위로 섞어서 새 배열로 반환 (원본은 안 건드림)
+// 배열을 무작위로 섞어서 새 배열로 반환
 function shuffle(arr) {
   const copy = [...arr];
   for (let i = copy.length - 1; i > 0; i--) {
@@ -362,7 +362,7 @@ function renderTipSlider(tips) {
   restartTipTimer();
 }
 
-// 슬라이더가 화면에 보이는 폭 (슬라이드 1개 = 이 폭만큼)
+// 슬라이더가 화면에 보이는 폭
 function getSliderWidth() {
   return tipTrackEl.parentElement.clientWidth;
 }
