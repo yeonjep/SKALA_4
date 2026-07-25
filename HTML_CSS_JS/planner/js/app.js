@@ -1,4 +1,4 @@
-// ===== 1. 요소 선택 =====
+// 1. 요소 선택
 const formEl = document.getElementById("goal-form");
 const titleInput = document.getElementById("goal-title");
 const categorySelect = document.getElementById("goal-category");
@@ -13,18 +13,20 @@ const sortEl = document.getElementById("sort-controls");
 const progressFillEl = document.getElementById("progress-fill");
 const progressTextEl = document.getElementById("progress-text");
 const summaryEl = document.getElementById("category-summary");
-const tipEl = document.getElementById("tip-text");
 
-const themeToggleEl = document.getElementById("theme-toggle");
+const tipTrackEl = document.getElementById("tip-track");
+const tipDotsEl = document.getElementById("tip-dots");
 
-// ===== 2. 상태 =====
+const themeToggleEl = document.getElementById("theme-toggle"); // 체크박스
+
+// 2. 상태
 const STORAGE_KEY = "skala-planner-goals";
 const THEME_KEY = "skala-planner-theme";
 
 let goals = load();
 let filter = "all"; // all | active | done
 let sortMode = "default"; // default | due | latest
-let justAddedId = null; // 방금 추가된 항목 id (등장 애니메이션용)
+let justAddedId = null; // 방금 추가된 항목 id, 등장 애니메이션용
 
 function load() {
   const raw = localStorage.getItem(STORAGE_KEY);
@@ -40,7 +42,7 @@ function save() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(goals));
 }
 
-// ===== 3. 목표 추가 (폼 제출) =====
+// 3. 목표 추가
 formEl.addEventListener("submit", function (e) {
   e.preventDefault();
 
@@ -71,7 +73,7 @@ formEl.addEventListener("submit", function (e) {
   titleInput.focus();
 });
 
-// ===== 4. 목록 클릭 위임 (완료 토글 / 삭제) =====
+// 4. 완료 토글 / 삭제 (이벤트 위임)
 listEl.addEventListener("click", function (e) {
   const itemEl = e.target.closest(".item");
   if (!itemEl) return;
@@ -98,7 +100,7 @@ listEl.addEventListener("click", function (e) {
   }
 });
 
-// ===== 5. 목표 제목 더블클릭 수정 =====
+// 5. 목표 제목 더블클릭 수정
 listEl.addEventListener("dblclick", function (e) {
   const textEl = e.target.closest(".item-text");
   if (!textEl) return;
@@ -140,7 +142,7 @@ listEl.addEventListener("dblclick", function (e) {
   });
 });
 
-// ===== 6. 탭 클릭 위임 (필터 전환) =====
+// 6. 필터 탭
 tabsEl.addEventListener("click", function (e) {
   const btn = e.target.closest(".tab");
   if (!btn) return;
@@ -155,7 +157,7 @@ tabsEl.addEventListener("click", function (e) {
   render();
 });
 
-// ===== 7. 정렬 버튼 =====
+// 7. 정렬
 sortEl.addEventListener("click", function (e) {
   const btn = e.target.closest(".sort-btn");
   if (!btn) return;
@@ -186,10 +188,10 @@ function sortGoals(list) {
   return copy;
 }
 
-// ===== 8. 검색 =====
+// 8. 검색
 searchInput.addEventListener("input", render);
 
-// ===== 9. 필터 + 검색 =====
+// 9. 필터 + 검색 조건
 function visible(goal) {
   const keyword = searchInput.value.trim().toLowerCase();
 
@@ -203,14 +205,14 @@ function visible(goal) {
   return matchesFilter && matchesKeyword;
 }
 
-// ===== 10. 마감일 지남 여부 =====
+// 10. 마감일 지남 여부
 function isOverdue(goal) {
   if (!goal.due || goal.done) return false;
   const today = new Date().toISOString().slice(0, 10);
   return goal.due < today;
 }
 
-// ===== 11. 렌더링 =====
+// 11. 렌더링
 function render() {
   const visibleGoals = sortGoals(goals.filter(visible));
 
@@ -251,7 +253,7 @@ function render() {
   updateSummary();
 }
 
-// ===== 12. 진행률 =====
+// 12. 진행률
 function updateProgress() {
   const total = goals.length;
   const doneCount = goals.filter((g) => g.done).length;
@@ -261,7 +263,7 @@ function updateProgress() {
   progressTextEl.textContent = `${doneCount} / ${total} 완료 (${percent}%)`;
 }
 
-// ===== 13. 분류별 요약 =====
+// 13. 분류별 요약
 function updateSummary() {
   const remaining = goals.filter((g) => !g.done);
 
@@ -277,30 +279,28 @@ function updateSummary() {
     : "남은 목표가 없습니다.";
 }
 
-// ===== 14. XSS 방지용 이스케이프 =====
+// 14. XSS 방지용 이스케이프
 function escapeHtml(str) {
   const div = document.createElement("div");
   div.textContent = str;
   return div.innerHTML;
 }
 
-// ===== 15. 다크 모드 =====
+// 15. 다크 모드 (체크박스 스위치)
 function loadTheme() {
   const saved = localStorage.getItem(THEME_KEY);
   if (saved === "dark") {
     document.body.classList.add("theme-dark");
-    themeToggleEl.textContent = "라이트모드";
+    themeToggleEl.checked = true;
   }
 }
 
-themeToggleEl.addEventListener("click", function () {
-  document.body.classList.toggle("theme-dark");
-  const isDark = document.body.classList.contains("theme-dark");
-  themeToggleEl.textContent = isDark ? "라이트모드" : "다크모드";
-  localStorage.setItem(THEME_KEY, isDark ? "dark" : "light");
+themeToggleEl.addEventListener("change", function () {
+  document.body.classList.toggle("theme-dark", themeToggleEl.checked);
+  localStorage.setItem(THEME_KEY, themeToggleEl.checked ? "dark" : "light");
 });
 
-// ===== 16. 오늘 날짜 표시 =====
+// 16. 오늘 날짜 표시
 const todayEl = document.getElementById("today");
 if (todayEl) {
   todayEl.textContent = new Date().toLocaleDateString("ko-KR", {
@@ -311,12 +311,11 @@ if (todayEl) {
   });
 }
 
-// ===== 17. 초기 실행 =====
-loadTheme();
-render();
-loadTip();
+// 17. 오늘의 팁 슬라이더 (fetch + 드래그)
+let tipIndex = 0;
+let tipTimer = null;
+let tipCount = 0;
 
-// ===== 18. 오늘의 팁 (fetch) =====
 async function loadTip() {
   try {
     const response = await fetch("data/tips.json");
@@ -326,12 +325,121 @@ async function loadTip() {
     }
 
     const tips = await response.json();
-    const random = tips[Math.floor(Math.random() * tips.length)];
+    const picked = shuffle(tips).slice(0, 3);
 
-    tipEl.textContent = `[${random.category}] ${random.tip}`;
+    renderTipSlider(picked);
   } catch (err) {
-    tipEl.textContent =
-      "오늘의 팁을 불러오지 못했어요. Live Server로 열었는지 확인해주세요.";
+    tipTrackEl.innerHTML = `<p class="tip-slide">오늘의 팁을 불러오지 못했어요. Live Server로 열었는지 확인해주세요.</p>`;
     console.error(err);
   }
 }
+
+// 배열을 무작위로 섞어서 새 배열로 반환 (원본은 안 건드림)
+function shuffle(arr) {
+  const copy = [...arr];
+  for (let i = copy.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy;
+}
+
+function renderTipSlider(tips) {
+  tipCount = tips.length;
+
+  tipTrackEl.innerHTML = tips
+    .map((t) => `<p class="tip-slide">[${t.category}] ${t.tip}</p>`)
+    .join("");
+
+  tipDotsEl.innerHTML = tips
+    .map(
+      (_, i) =>
+        `<button type="button" class="tip-dot${i === 0 ? " is-active" : ""}" data-index="${i}" aria-label="${i + 1}번째 팁"></button>`,
+    )
+    .join("");
+
+  goToTip(0);
+  restartTipTimer();
+}
+
+// 슬라이더가 화면에 보이는 폭 (슬라이드 1개 = 이 폭만큼)
+function getSliderWidth() {
+  return tipTrackEl.parentElement.clientWidth;
+}
+
+function goToTip(index) {
+  tipIndex = index;
+  const width = getSliderWidth();
+  tipTrackEl.style.transform = `translateX(${-index * width}px)`;
+
+  tipDotsEl.querySelectorAll(".tip-dot").forEach((dot, i) => {
+    dot.classList.toggle("is-active", i === index);
+  });
+}
+
+function restartTipTimer() {
+  clearInterval(tipTimer);
+  tipTimer = setInterval(() => {
+    goToTip((tipIndex + 1) % tipCount);
+  }, 4000);
+}
+
+// 점 클릭하면 해당 팁으로 바로 이동, 자동 전환은 재시작
+tipDotsEl.addEventListener("click", function (e) {
+  const dot = e.target.closest(".tip-dot");
+  if (!dot) return;
+
+  goToTip(Number(dot.dataset.index));
+  restartTipTimer();
+});
+
+// 손으로 잡아 끌어서 슬라이드 넘기기 (마우스 + 터치 공통 처리)
+let dragStartX = 0;
+let dragOffset = 0;
+let isDragging = false;
+
+tipTrackEl.addEventListener("pointerdown", function (e) {
+  isDragging = true;
+  dragStartX = e.clientX;
+  dragOffset = 0;
+
+  tipTrackEl.style.transition = "none";
+  clearInterval(tipTimer);
+  tipTrackEl.setPointerCapture(e.pointerId);
+});
+
+tipTrackEl.addEventListener("pointermove", function (e) {
+  if (!isDragging) return;
+
+  dragOffset = e.clientX - dragStartX;
+  const width = getSliderWidth();
+  tipTrackEl.style.transform = `translateX(${-tipIndex * width + dragOffset}px)`;
+});
+
+function endTipDrag() {
+  if (!isDragging) return;
+  isDragging = false;
+
+  tipTrackEl.style.transition = "";
+
+  const width = getSliderWidth();
+  const threshold = width * 0.2;
+
+  let nextIndex = tipIndex;
+  if (dragOffset < -threshold && tipIndex < tipCount - 1) {
+    nextIndex = tipIndex + 1;
+  } else if (dragOffset > threshold && tipIndex > 0) {
+    nextIndex = tipIndex - 1;
+  }
+
+  goToTip(nextIndex);
+  restartTipTimer();
+}
+
+tipTrackEl.addEventListener("pointerup", endTipDrag);
+tipTrackEl.addEventListener("pointercancel", endTipDrag);
+
+// 18. 초기 실행
+loadTheme();
+render();
+loadTip();

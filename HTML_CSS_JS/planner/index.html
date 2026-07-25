@@ -1,28 +1,38 @@
 <!doctype html>
+<!-- 문서 언어를 한국어로 지정 -->
 <html lang="ko">
   <head>
+    <!-- 한글 깨짐 방지 -->
     <meta charset="UTF-8" />
+    <!-- 모바일에서 화면이 축소 방지-->
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>SKALA 스터디 플래너</title>
     <link rel="stylesheet" href="css/style.css" />
   </head>
   <body>
+    <!-- 상단 헤더: 로고, 오늘 날짜, 다크모드 스위치 -->
     <header class="header">
       <div class="header-left">
         <h1 class="logo">SKALA 스터디 플래너</h1>
+        <!-- 날짜는 JS에서 -->
         <p class="today" id="today"></p>
       </div>
-      <button type="button" id="theme-toggle" class="theme-toggle">
-        다크모드
-      </button>
+      <div class="theme-switch-wrap">
+        <span class="theme-switch-label">다크모드</span>
+        <label class="theme-switch">
+          <input type="checkbox" id="theme-toggle" />
+          <span class="theme-switch-slider"></span>
+        </label>
+      </div>
     </header>
 
     <main class="container">
-      <!-- ① 학습 목표 추가 -->
+      <!-- 1. 목표 추가 폼 -->
       <section class="panel">
         <h2 class="panel-title">학습 목표 추가</h2>
         <form id="goal-form" class="goal-form">
           <div class="form-row">
+            <!-- placeholder는 label 대체 아니라서 sr-only로 라벨 따로 둠 -->
             <label for="goal-title" class="sr-only">목표 제목</label>
             <input
               type="text"
@@ -33,6 +43,7 @@
               required
             />
 
+            <!-- HTML/CSS/JS 값 : 분류별 요약 집계 기준 -->
             <label for="goal-category" class="sr-only">분류</label>
             <select id="goal-category" class="form-input form-select">
               <option value="HTML">HTML</option>
@@ -53,10 +64,11 @@
         </form>
       </section>
 
-      <!-- ② 학습 목록 -->
+      <!-- 2. 목표 목록 -->
       <section class="panel">
         <div class="panel-head">
           <h2 class="panel-title">학습 목록</h2>
+          <!-- data-filter 값으로 이벤트 위임 처리 -->
           <div class="tabs" id="filter-tabs">
             <button type="button" class="tab is-active" data-filter="all">
               전체
@@ -68,6 +80,7 @@
           </div>
         </div>
 
+        <!-- 입력할 때마다 실시간 필터링 -->
         <div class="search-row">
           <label for="goal-search" class="sr-only">목표 검색</label>
           <input
@@ -79,6 +92,7 @@
           />
         </div>
 
+        <!-- data-sort 값 기준 정렬 -->
         <div class="sort-row" id="sort-controls">
           <span class="sort-label">정렬</span>
           <button type="button" class="sort-btn is-active" data-sort="default">
@@ -92,13 +106,16 @@
           </button>
         </div>
 
+        <!-- 목표 목록 : render() -->
         <ul id="goal-list" class="goal-list"></ul>
 
+        <!-- 목록 비었을 때만 JS가 hidden 제거해서 보여줌 -->
         <div class="list-empty" id="list-empty" hidden>
           <p class="list-empty-title">아직 등록된 목표가 없어요.</p>
           <p class="list-empty-desc">예: "HTML 시맨틱 태그 복습하기"</p>
         </div>
 
+        <!-- 진행률 %  -->
         <div class="progress">
           <div class="progress-bar">
             <div class="progress-fill" id="progress-fill"></div>
@@ -106,13 +123,17 @@
           <p class="progress-text" id="progress-text">0 / 0 완료 (0%)</p>
         </div>
 
+        <!-- 분류별 남은 개수 요약 -->
         <p class="summary" id="category-summary"></p>
       </section>
 
-      <!-- ③ 오늘의 팁 -->
+      <!-- 3. 오늘의 팁: fetch로 data/tips.json 읽어서 3개를 슬라이드로 표시 -->
       <section class="panel">
         <h2 class="panel-title">오늘의 팁</h2>
-        <p class="tip" id="tip-text">불러오는 중...</p>
+        <div class="tip-slider">
+          <div class="tip-track" id="tip-track"></div>
+          <div class="tip-dots" id="tip-dots"></div>
+        </div>
       </section>
     </main>
 
