@@ -7,9 +7,10 @@
   --color-bg: #f4f4f7;
   --color-bg-subtle: #f2f2f4;
   --color-panel: #ffffff;
-  --color-brand-rgb: 224, 41, 60; /* rgba로 투명도 줄 때 사용 */
+  --color-brand-rgb: 224, 41, 60; /* rgba로 투명도 */
   --radius: 16px;
 }
+
 
 /* 2. 다크 모드 변수 */
 body.theme-dark {
