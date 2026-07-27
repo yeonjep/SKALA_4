@@ -122,7 +122,7 @@ body {
   height: 24px;
 }
 
-/* 실제 체크박스는 화면에서 숨기고, 옆의 slider로 대신 보여줌 */
+/* 실제 체크박스는 화면에서 숨기고 옆의 slider로 대신 보여줌 */
 .theme-switch input {
   position: absolute;
   opacity: 0;
@@ -233,7 +233,7 @@ body {
   min-width: 0;
 }
 
-/* 브라우저 기본 화살표 지우고 커스텀 SVG 화살표로 교체 */
+/* 브라우저 기본 화살표를 커스텀 SVG 화살표로 교체 */
 .form-select {
   flex: 0 0 120px;
   appearance: none;
