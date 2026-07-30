@@ -1,0 +1,77 @@
+plugins {
+    // Java 프로젝트 빌드 기능
+    id 'java'
+
+    // ./gradlew run 실행 기능
+    id 'application'
+}
+
+group = 'com.example'
+version = '1.0.0'
+
+repositories {
+    // 외부 라이브러리를 Maven Central에서 다운로드
+    mavenCentral()
+}
+
+dependencies {
+    // Java 프로그램에서 MariaDB에 접속하기 위한 JDBC 드라이버
+    implementation 'org.mariadb.jdbc:mariadb-java-client:3.4.1'
+
+    // JUnit 테스트 라이브러리
+    testImplementation platform('org.junit:junit-bom:5.10.2')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+application {
+    // 실행할 main() 메서드가 있는 클래스
+    mainClass = 'LoginAppDB'
+}
+
+java {
+    toolchain {
+        // Java 17 사용
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
+tasks.named('test') {
+    // JUnit 5 사용
+    useJUnitPlatform()
+}
+
+/*
+ * 외부 라이브러리까지 포함한 실행 가능한 Fat JAR 생성
+ *
+ * 일반 jar 파일에는 MariaDB JDBC 드라이버가 포함되지 않으므로
+ * runtimeClasspath의 라이브러리를 모두 JAR 안에 포함합니다.
+ */
+tasks.named('jar') {
+
+    // 생성되는 파일명: login-app.jar
+    archiveBaseName = 'login-app'
+    archiveVersion = ''
+
+    // java -jar 실행 시 시작할 Main 클래스 지정
+    manifest {
+        attributes(
+                'Main-Class': application.mainClass.get()
+        )
+    }
+
+    // 라이브러리 통합 과정에서 중복 파일 제외
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
+    // 실행에 필요한 외부 라이브러리를 JAR에 포함
+    from {
+        configurations.runtimeClasspath.collect {
+            it.isDirectory() ? it : zipTree(it)
+        }
+    }
+}
+
+tasks.named('run', JavaExec) {
+    // 터미널에서 입력한 내용을 실행 중인 Java 프로그램에 전달
+    standardInput = System.in
+}
