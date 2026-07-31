@@ -1,0 +1,50 @@
+# version: "3.8"
+
+services:
+  sqldb:
+    image: mariadb:10.5.18
+    ports:
+      - 3379:3306
+    volumes: # 배포한 mariadb_tmplt를 본인 PC로 복사하고, 해당 위치 경로로 수정하여 사용
+      # /Users/phoenix/Eagle/2025_FastAPIs/mariadb_tmplt/ ->  본인 PC 경로로 변경 (아래 4개 모두)
+      - ./mariadb_tmplt/conf.d:/etc/mysql/conf.d
+      - ./mariadb_tmplt/data:/var/lib/mysql
+      - ./mariadb_tmplt/initdb.d:/docker-entrypoint-initdb.d
+      - ./mariadb_tmplt/bak:/home/bak
+    env_file: env
+    environment:
+      TZ: Asia/Seoul
+    command: "mysqld --innodb-buffer-pool-size=2G --innodb_buffer_pool_instances=2 --lower_case_table_names=1" # lower_case_table_names=1 옵션은 DB 이름 규칙을 OS로부터 독립시키는 안전장치 (모든 테이블을 소문자로 통일하여 컨테이너 DBMS를 OS 환경 차이로부터 분리)
+    networks:
+      - backend
+    restart: always
+
+networks:
+  backend:
+
+# 이 컨테이너 생성 명령어 실행 전에 반드시 도커 데스크탑이 먼저 실행되고 있어야 합니다.
+# docker-compose로 실행바랍니다. (참고로 docker compose가 최신 버전입니다.)
+# docker-compose -p <프로젝트명> -f <파일명> up -d, mariadb.yaml -> 기본 파일인 docker-compose.yml 대신 사용
+# docker-compose -p maria_db -f maria_db.yaml up -d
+
+# client는 다음 링크에서 Mysql Workbench 다운로드하여 사용
+# https://dev.mysql.com/downloads/workbench/
+
+# DBMS 접속 후, 다음 스키마 정보가 없을 경우에 생성하여 사용.
+# > CREATE SCHEMA 'demo' DEFAULT CHARACTER SET utf8mb4 ;
+# > CREATE SCHEMA 'sql_db' DEFAULT CHARACTER SET utf8mb4 ;
+
+# 사용자 생성 (manager가 없을 경우) 및 권한 부여
+# > CREATE USER 'manager'@'%' IDENTIFIED BY 'SqlDba-1’ ; 컨테이너로 실행한 경우는 USER는 이미 생성되어 있으므로 생략합니다.
+# > GRANT ALL PRIVILEGES ON demo.* TO 'manager'@'%' IDENTIFIED BY 'SqlDba-1’;
+# > FLUSH PRIVILEGES;
+
+# 로그인에 사용할 사용자 테이블 생성 (users)
+# CREATE TABLE 'users' (
+#   'id' bigint(20) NOT NULL AUTO_INCREMENT,
+#   'username' varchar(50) NOT NULL,
+#   'password' varchar(255) NOT NULL,
+#   'created_at' timestamp NOT NULL DEFAULT current_timestamp(),
+#   PRIMARY KEY ('id'),
+#   UNIQUE KEY 'username' ('username')
+# ) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;

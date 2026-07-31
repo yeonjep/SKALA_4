@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1.0">
+
+    <title>Authentication Home</title>
+
+    <link
+            rel="stylesheet"
+            href="/static/style.css">
+</head>
+
+<body>
+
+<div class="home-container">
+
+    <header class="home-header">
+
+        <div>
+            <p class="home-label">
+                AUTHENTICATION DEMO
+            </p>
+
+            <h1>
+                Pure Java Login System
+            </h1>
+
+            <p class="home-subtitle">
+                JWT Cookie 기반 사용자 인증 예제
+            </p>
+        </div>
+
+    </header>
+
+    <main class="home-panel">
+
+        <section class="welcome-section">
+
+            <div class="success-badge">
+                ✓
+            </div>
+
+            <div>
+                <h2 id="welcome">
+                    로그인에 성공했습니다.
+                </h2>
+
+                <p class="home-description">
+                    JWT Cookie 인증이 정상적으로 완료되었습니다.<br>
+                    현재 사용자는 인증된 상태입니다.
+                </p>
+            </div>
+
+        </section>
+
+        <section class="status-section">
+
+            <h3>
+                Authentication Information
+            </h3>
+
+            <div class="status-box">
+
+                <div class="status-item">
+                    <span>Framework</span>
+                    <strong>Pure Java HTTP Server</strong>
+                </div>
+
+                <div class="status-item">
+                    <span>Authentication</span>
+                    <strong>JWT Cookie</strong>
+                </div>
+
+                <div class="status-item">
+                    <span>Password Security</span>
+                    <strong>BCrypt</strong>
+                </div>
+
+                <div class="status-item">
+                    <span>Database</span>
+                    <strong>MariaDB</strong>
+                </div>
+
+            </div>
+
+        </section>
+
+        <div class="home-actions">
+
+            <button
+                    id="logout"
+                    type="button">
+
+                Logout
+
+            </button>
+
+        </div>
+
+    </main>
+
+</div>
+
+<script src="/app.js"></script>
+
+<script>
+    const logoutButton = document.querySelector("#logout");
+
+    logoutButton.addEventListener("click", async () => {
+        logoutButton.disabled = true;
+        logoutButton.textContent = "Logging out...";
+
+        try {
+            /*
+             * Pure Java 인증 서버의 로그아웃 엔드포인트입니다.
+             * 서버에서는 ACCESS_TOKEN 쿠키를 Max-Age=0으로 내려 삭제해야 합니다.
+             */
+            const response = await fetch("/api/logout", {
+                method: "POST",
+                credentials: "include"
+            });
+
+            if (!response.ok && response.status !== 204) {
+                throw new Error(`Logout failed: ${response.status}`);
+            }
+        } catch (error) {
+            console.error("로그아웃 요청 중 오류가 발생했습니다.", error);
+        } finally {
+            /*
+             * 서버 응답 여부와 관계없이 로그인 화면으로 이동합니다.
+             * 캐시된 home.html이 다시 보이지 않도록 replace()를 사용합니다.
+             */
+            window.location.replace("/login");
+        }
+    });
+</script>
+
+</body>
+
+</html>

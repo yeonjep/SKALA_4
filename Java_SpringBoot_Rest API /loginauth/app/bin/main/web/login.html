@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>로그인</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<div class="container">
+    <h1>로그인</h1>
+    <form method="POST" action="/api/login">
+        <label>아이디
+            <input type="text" name="username" required>
+        </label>
+        <label>비밀번호
+            <input type="password" name="password" required>
+        </label>
+        <button type="submit">로그인</button>
+    </form>
+    <p>아직 계정이 없으신가요? <a href="/signup">회원가입</a></p>
+</div>
+<script src="/static/app.js"></script>
+</body>
+</html>
