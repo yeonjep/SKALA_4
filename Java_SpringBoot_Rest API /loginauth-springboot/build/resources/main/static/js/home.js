@@ -1,0 +1,1 @@
+(async()=>{const r=await fetch('/api/auth/check',{credentials:'include'});if(!r.ok){location.href='/login';return;}const data=await r.json();welcome.textContent=`Welcome, ${data.username}`;})();logout.addEventListener('click',async()=>{await fetch('/api/auth/logout',{method:'POST',credentials:'include'});location.href='/login';});

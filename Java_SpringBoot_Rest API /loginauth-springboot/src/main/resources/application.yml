@@ -1,0 +1,21 @@
+server:
+  port: 8888
+
+spring:
+  datasource:
+    url: ${DB_URL:jdbc:mariadb://localhost:53301/sql_db}
+    username: ${DB_USER:root}
+    password: ${DB_PASSWORD:SqlDba-1}
+    driver-class-name: org.mariadb.jdbc.Driver
+  sql:
+    init:
+      mode: always
+
+app:
+  frontend-origin: ${FRONTEND_ORIGIN:http://localhost:5174}
+  cookie:
+    secure: ${COOKIE_SECURE:false}
+  jwt:
+    secret: ${JWT_SECRET:change-this-development-secret-key-at-least-32-characters}
+    issuer: ${JWT_ISSUER:loginauth-springboot}
+    access-token-ttl: 1h
