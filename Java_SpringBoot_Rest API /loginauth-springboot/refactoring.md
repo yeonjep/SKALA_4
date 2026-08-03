@@ -78,5 +78,18 @@ Controller 접근 허용
 java -jar build/libs/loginauth-springboot-0.0.1-SNAPSHOT.jar
 ------------------------------------------------------------
 
+./gradlew clean bootJar
+: 기존 빌드 결과물을 지우고(clean), 실행 가능한 JAR 파일을 새로 생성합니다(bootJar는 Spring Boot 플러그인이 제공하는 태스크로, 의존성까지 포함한 "fat jar"를 만듭니다).
+파일명은, settings.gradle의 프로젝트 이름 + build.gradle의 버전이 합쳐져서 결정됩니다.
+
+java -jar build/libs/loginauth-springboot-0.0.1-SNAPSHOT.jar
+: 생성된 JAR을 직접 실행합니다. 내장 톰캣(embedded Tomcat)이 포함되어 있어 별도 웹서버 설치 없이 바로 구동됩니다.
+
+http://localhost:8888/login: application.yml 에 server.port=8888로 설정되어 있습니다.(기본값은 8080입니다).
+
+참고, 개발 중 바로 실행 : ./gradlew bootRun (JAR 빌드 없이 바로 애플리케이션 구동, 개발 시 가장 많이 씀)
+배포용 JAR 생성 후 실행: ./gradlew clean bootJar → java -jar build/libs/....jar
+
 접속 주소는 다음과 같습니다.
-http://localhost:8080/login
+---------------------
+http://localhost:8888/login

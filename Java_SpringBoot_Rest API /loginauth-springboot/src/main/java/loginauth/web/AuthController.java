@@ -39,6 +39,30 @@ public class AuthController {
         this.cookieService = cookieService;
     }
 
+    /*
+     * 회원가입
+     *
+     * signup.html이 일반 form 방식으로
+     * application/x-www-form-urlencoded 요청을 보내므로
+     * @RequestBody는 사용하지 않습니다.
+     */
+    @PostMapping("/signup")
+    public void signup(
+            @Valid LoginRequest request,
+            HttpServletResponse response
+    ) throws IOException {
+
+        authService.signUp(
+                request.username(),
+                request.password()
+        );
+
+        response.sendRedirect("/login");
+    }
+
+    /*
+     * 로그인
+     */
     @PostMapping("/login")
     public void login(
             @Valid LoginRequest request,
@@ -74,6 +98,9 @@ public class AuthController {
         response.sendRedirect("/home.html");
     }
 
+    /*
+     * 현재 로그인 사용자 인증 확인
+     */
     @GetMapping("/check")
     public AuthCheckResponse check(
             Authentication authentication

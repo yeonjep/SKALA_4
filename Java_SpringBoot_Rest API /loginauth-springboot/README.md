@@ -5,9 +5,9 @@
 
 # Spring Boot 프로젝트 구조를 "실행 흐름"을 따라가는 순서로 이해합니다.
 
-1. 진입점(Application.java): LoginAuthApplication.java부터 시작합니다. Spring Boot는 이 파일의 main() 메서드에서 내장 서버(Tomcat)를 띄우며 실행되므로, 프로젝트의 시작점이 됩니다.
+1. 진입점(Application.java) : LoginAuthApplication.java부터 시작합니다. Spring Boot는 이 파일의 main() 메서드에서 내장 서버(Tomcat)를 띄우며 실행되므로, 프로젝트의 시작점이 됩니다.
 
-2. 설정(config, application.yml): 애플리케이션이 어떤 설정으로 동작하는지(DB 연결, 포트 등) 설명합니다. application.yml과 config 패키지를 함께 다룹니다.
+2. 설정(config, application.yml) : 애플리케이션이 어떤 설정으로 동작하는지(DB 연결, 포트 등) 설명합니다. application.yml과 config 패키지를 함께 다룹니다.
 
 3. 요청 진입 → 도메인 → 저장소 순서 (web → service → domain/repository)
 - web: 사용자의 HTTP 요청을 받는 컨트롤러 계층 (예: 로그인 요청을 받는 곳)
@@ -16,11 +16,11 @@
 - repository: DB와 실제로 상호작용하는 계층
 즉, "요청이 들어와서 → 처리되고 → 저장되는" 흐름 순서로 이해할 수 있습니다.
 
-4. 보안(security): 인증/인가를 어떻게 처리하는지(Spring Security 설정) 제시합니다. 로그인 인증 프로그램이니 이 부분이 핵심 포인트가 될 것입니다.
+4. 보안(security) : 인증/인가를 어떻게 처리하는지(Spring Security 설정) 제시합니다. 로그인 인증 프로그램이니 이 부분이 핵심 포인트가 될 것입니다.
 
-5. 예외 처리(exception): 에러 상황을 어떻게 핸들링하는지 제시합니다.
+5. 예외 처리(exception)  : 에러 상황을 어떻게 핸들링하는지 제시합니다.
 
-6. 화면(resources/static): login.html, signup.html, home.html 등 실제 사용자가 보는 화면과, 이 화면들이 앞서 설명한 컨트롤러와 어떻게 연결되는지 이해합니다.
+6. 화면(resources/static) : login.html, signup.html, home.html 등 실제 사용자가 보는 화면과, 이 화면들이 앞서 설명한 컨트롤러와 어떻게 연결되는지 이해합니다.
 
 
 # Spring Boot는 Annotation이 핵심입니다. Annotation은 기계가 읽는 주석이라는 뜻이며, 실제로 일을 하는 건 그 태그를 읽고 반응하는 스프링의 엔진(컴포넌트 스캐너, 리플렉션, 빈 팩토리)입니다.
@@ -65,7 +65,7 @@
 정리하면, "폴더 이름은 껍데기고, 실제로 스프링이 반응하는 건 이 어노테이션들입니다.
 
 
-# 핵심: Spring Boot는 명시적 연결이 필요 없습니다
+# 핵심 : Spring Boot는 명시적 연결이 필요 없습니다.
 
 1. 순수 Java에서는 main()에서 직접 new LoginService(), new UserRepository() 등을 만들어 연결했어야 합니다. 하지만 Spring Boot는 @SpringBootApplication 어노테이션 하나가 그 역할을 대신합니다.
 
@@ -105,7 +105,7 @@ web 패키지 안의 컨트롤러 클래스를 열어보면 클래스 상단에 
 # 실행
 1. MariaDB 실행 후 `sql_db` 데이터베이스를 생성합니다.
 2. JDK 21과 Gradle 8.14+ 또는 9.x를 준비합니다.
-3. 필요하면 환경변수를 설정합니다.
+3. 필요하면 환경변수를 설정합니다. 예제는 application.yml 파일에 설정되어 있습니다.
 
 ```bash
 export DB_URL='jdbc:mariadb://localhost:53301/sql_db'
@@ -115,7 +115,7 @@ export JWT_SECRET='충분히-긴-운영용-비밀키-32자-이상'
 ./gradlew bootRun
 ```
 
-브라우저: `http://localhost:8080/login`
+브라우저: `http://localhost:8888/login`
 
 # API
 - `POST /api/auth/signup` JSON: `{"username":"user1","password":"password123"}`
