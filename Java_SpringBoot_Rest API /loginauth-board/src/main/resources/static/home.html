@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1.0">
+
+    <title>Authentication Home</title>
+
+    <link
+            rel="stylesheet"
+            href="/css/style.css">
+</head>
+
+<body class="home-page">
+
+<header class="app-header">
+
+    <div class="brand">
+
+        <div class="brand-text">
+
+            <h1>
+                Authentication Demo
+            </h1>
+
+            <p>
+                Spring Boot + JWT Cookie Authentication
+            </p>
+
+        </div>
+
+    </div>
+
+    <button
+            id="logout"
+            class="header-logout-button"
+            type="button">
+
+        Logout
+
+    </button>
+
+</header>
+
+<main class="home-main">
+
+    <section class="hero-section">
+
+        <div class="success-icon">
+            ✓
+        </div>
+
+        <h2>
+            Authentication Complete
+        </h2>
+
+        <p>
+            SRP 기반 Spring Boot 인증 구조 리팩토링 데모
+        </p>
+
+    </section>
+
+    <section class="dashboard-card">
+
+        <div class="welcome-panel">
+
+            <h3 id="welcome">
+                Welcome
+            </h3>
+
+            <div class="title-line"></div>
+
+            <p class="welcome-description">
+                SpringBoot로 리팩토링 된 방식으로, 로그인 인증이 성공적으로 완료되었습니다.<br>
+                현재 사용자는 JWT Cookie 기반으로 인증되었습니다.
+            </p>
+
+            <p class="architecture-description">
+                본 예제는 여러 역할이 하나의 클래스에 혼재하던
+                순수 Java 인증 서버를 Spring Boot 기반으로 리팩토링한 구조입니다.
+                <br><br>
+                SRP(Single Responsibility Principle)를 적용하여
+                Controller, Service, Repository, Security 영역의 책임을 분리하고,
+                유지보수성과 확장성을 높였습니다.
+                <br><br>
+                참고로, 일반적으로 사용자 로그인은 JWT Cookie 방식으로 구현하지만
+                향후 API 인증은 Bearer Token 방식으로 구현합니다.
+            </p>
+
+            <div class="authentication-status">
+
+                <span class="status-icon">
+                    ✓
+                </span>
+
+                <span>
+                    인증 처리와 계층별 책임 분리가 정상적으로 적용되었습니다.
+                </span>
+
+            </div>
+
+        </div>
+
+        <div class="feature-panel">
+
+            <h3>
+                Architecture Improvements
+            </h3>
+
+            <div class="feature-list">
+
+                <div class="feature-item">
+                    <span class="feature-icon">●</span>
+                    <span>SRP 기반 책임 분리</span>
+                </div>
+
+                <div class="feature-item">
+                    <span class="feature-icon">●</span>
+                    <span>Controller / Service / Repository 계층화</span>
+                </div>
+
+                <div class="feature-item">
+                    <span class="feature-icon">●</span>
+                    <span>Dependency Injection</span>
+                </div>
+
+                <div class="feature-item">
+                    <span class="feature-icon">●</span>
+                    <span>Spring Security Filter Chain</span>
+                </div>
+
+                <div class="feature-item">
+                    <span class="feature-icon">●</span>
+                    <span>JWT Cookie Authentication</span>
+                </div>
+
+                <div class="feature-item">
+                    <span class="feature-icon">●</span>
+                    <span>BCrypt Password Encoding</span>
+                </div>
+
+                <div class="feature-item">
+                    <span class="feature-icon">●</span>
+                    <span>유지보수 및 기능 확장이 쉬운 구조</span>
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+</main>
+
+<footer class="app-footer">
+    © 2026 Authentication Demo
+</footer>
+
+<script src="/js/home.js"></script>
+
+</body>
+
+</html>

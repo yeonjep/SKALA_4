@@ -1,0 +1,26 @@
+SecurityConfig의 authorizeHttpRequests 설정 예시입니다.
+
+.requestMatchers(
+        "/",
+        "/login",
+        "/login.html",
+        "/signup",
+        "/signup.html",
+        "/css/**",
+        "/js/**",
+        "/favicon.ico",
+        "/api/auth/login",
+        "/api/auth/signup",
+        "/error"
+).permitAll()
+
+.requestMatchers(
+        "/home.html",
+        "/board.html",
+        "/post-form.html",
+        "/api/auth/check",
+        "/api/auth/logout",
+        "/api/posts/**"
+).authenticated()
+
+.anyRequest().authenticated()

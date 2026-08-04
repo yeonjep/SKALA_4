@@ -1,0 +1,504 @@
+/* Common */
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    background: #f6f7f9;
+    color: #242424;
+    font-family:
+            system-ui,
+            -apple-system,
+            BlinkMacSystemFont,
+            "Segoe UI",
+            sans-serif;
+}
+
+/* Header */
+
+.board-header {
+    padding: 22px 5%;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    background: #ffffff;
+    border-bottom: 1px solid #e4e6ea;
+}
+
+.board-header h1 {
+    margin: 0 0 5px;
+
+    color: #b71c1c;
+
+    font-size: 27px;
+    line-height: 1.25;
+}
+
+.board-header p {
+    margin: 0;
+
+    color: #777777;
+
+    font-size: 14px;
+}
+
+.board-header nav {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.board-header a,
+.board-header button,
+.primary-link,
+.secondary-link {
+    padding: 11px 18px;
+
+    border: 0;
+    border-radius: 7px;
+
+    font-size: 14px;
+    font-weight: 700;
+
+    text-decoration: none;
+    cursor: pointer;
+
+    transition:
+            background-color 0.2s,
+            transform 0.2s;
+}
+
+.board-header a,
+.secondary-link {
+    background: #f0f1f3;
+    color: #444444;
+}
+
+.board-header a:hover,
+.secondary-link:hover {
+    background: #e2e4e8;
+}
+
+.board-header button,
+.primary-link,
+.primary-button {
+    background: #c62828;
+    color: #ffffff;
+}
+
+.board-header button:hover,
+.primary-link:hover,
+.primary-button:hover {
+    background: #b71c1c;
+}
+
+.board-header button:active,
+.primary-link:active,
+.primary-button:active {
+    transform: translateY(1px);
+}
+
+/* Board Layout */
+
+.board-main {
+    width: min(1200px, calc(100% - 32px));
+
+    margin: 45px auto;
+}
+
+.board-toolbar {
+    margin-bottom: 18px;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+
+    gap: 20px;
+}
+
+.board-toolbar h2 {
+    margin: 0 0 7px;
+
+    font-size: 28px;
+    line-height: 1.25;
+}
+
+.board-toolbar p {
+    margin: 0;
+
+    color: #777777;
+}
+
+.board-card {
+    overflow: hidden;
+
+    background: #ffffff;
+
+    border: 1px solid #e2e4e8;
+    border-radius: 12px;
+
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.07);
+}
+
+/* Board Table */
+
+.board-card table {
+    width: 100%;
+
+    border-collapse: collapse;
+    table-layout: fixed;
+}
+
+.board-card th,
+.board-card td {
+    padding: 18px 20px;
+
+    border-bottom: 1px solid #eceef1;
+
+    text-align: left;
+    vertical-align: middle;
+}
+
+.board-card th {
+    background: #fafafa;
+    color: #555555;
+
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.board-card tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.board-card tbody tr:hover {
+    background: #fffafa;
+}
+
+/*
+ * 컬럼 폭
+ *
+ * 번호: 고정
+ * 제목: 남은 공간 사용
+ * 작성자: 고정
+ * 작성일: 한 줄 출력이 가능하도록 넓게 고정
+ */
+
+.id-column {
+    width: 90px;
+}
+
+.title-column {
+    width: auto;
+}
+
+.writer-column {
+    width: 150px;
+}
+
+.date-column {
+    width: 260px;
+    white-space: nowrap;
+}
+
+/*
+ * tbody는 JavaScript로 생성되므로
+ * 클래스가 없어도 nth-child 기준으로 동일하게 적용합니다.
+ */
+
+.board-card th:nth-child(1),
+.board-card td:nth-child(1) {
+    width: 90px;
+}
+
+.board-card th:nth-child(2),
+.board-card td:nth-child(2) {
+    width: auto;
+}
+
+.board-card th:nth-child(3),
+.board-card td:nth-child(3) {
+    width: 150px;
+}
+
+.board-card th:nth-child(4),
+.board-card td:nth-child(4) {
+    width: 260px;
+
+    white-space: nowrap;
+}
+
+/* 번호, 작성자, 작성일 정렬 */
+
+.board-card th:nth-child(1),
+.board-card td:nth-child(1),
+.board-card th:nth-child(3),
+.board-card td:nth-child(3),
+.board-card th:nth-child(4),
+.board-card td:nth-child(4) {
+    text-align: center;
+}
+
+/* 제목 */
+
+.title-button {
+    max-width: 100%;
+
+    padding: 0;
+
+    border: 0;
+    background: transparent;
+    color: #222222;
+
+    font: inherit;
+    font-weight: 700;
+
+    text-align: left;
+    cursor: pointer;
+
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+
+    transition: color 0.2s;
+}
+
+.title-button:hover {
+    color: #c62828;
+}
+
+/* 게시글 없음 */
+
+.empty-row {
+    padding: 55px !important;
+
+    color: #888888;
+
+    text-align: center !important;
+}
+
+/* Post Detail */
+
+.post-detail {
+    margin-top: 14px;
+    padding: 22px 24px;
+
+    background: #fff8f8;
+
+    border-left: 4px solid #c62828;
+    border-radius: 0 8px 8px 0;
+
+    line-height: 1.75;
+}
+
+.post-detail p {
+    margin: 0;
+
+    color: #444444;
+
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+.detail-actions {
+    margin-top: 18px;
+
+    display: flex;
+    gap: 9px;
+}
+
+.detail-actions a,
+.detail-actions button {
+    padding: 9px 14px;
+
+    border: 0;
+    border-radius: 6px;
+
+    background: #eeeeee;
+    color: #333333;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.detail-actions a:hover,
+.detail-actions button:hover {
+    background: #dedede;
+}
+
+/* Post Form */
+
+.form-main {
+    max-width: 850px;
+}
+
+.form-card {
+    padding: 34px;
+}
+
+.form-card h2 {
+    margin: 0 0 24px;
+
+    color: #b71c1c;
+}
+
+.form-card form {
+    display: flex;
+    flex-direction: column;
+
+    gap: 10px;
+}
+
+.form-card label {
+    margin-top: 10px;
+
+    color: #333333;
+
+    font-weight: 700;
+}
+
+.form-card input,
+.form-card textarea {
+    width: 100%;
+    padding: 13px 14px;
+
+    border: 1px solid #d3d6dc;
+    border-radius: 7px;
+
+    background: #ffffff;
+
+    font: inherit;
+
+    transition:
+            border-color 0.2s,
+            box-shadow 0.2s;
+}
+
+.form-card input:focus,
+.form-card textarea:focus {
+    outline: none;
+
+    border-color: #c62828;
+
+    box-shadow: 0 0 0 3px rgba(198, 40, 40, 0.12);
+}
+
+.form-card textarea {
+    resize: vertical;
+
+    line-height: 1.65;
+}
+
+.form-actions {
+    margin-top: 22px;
+
+    display: flex;
+    justify-content: flex-end;
+
+    gap: 10px;
+}
+
+.primary-button {
+    padding: 11px 22px;
+
+    border: 0;
+    border-radius: 7px;
+
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.message {
+    margin-top: 12px;
+
+    color: #b71c1c;
+
+    font-weight: 600;
+}
+
+/* Responsive */
+
+@media (max-width: 800px) {
+
+    .board-header,
+    .board-toolbar {
+        align-items: flex-start;
+        flex-direction: column;
+
+        gap: 16px;
+    }
+
+    .board-header {
+        padding: 20px 24px;
+    }
+
+    .board-main {
+        margin-top: 25px;
+    }
+
+    .board-card th,
+    .board-card td {
+        padding: 15px 14px;
+    }
+
+    .writer-column,
+    .date-column,
+    .board-card th:nth-child(3),
+    .board-card td:nth-child(3),
+    .board-card th:nth-child(4),
+    .board-card td:nth-child(4) {
+        display: none;
+    }
+
+    .id-column,
+    .board-card th:nth-child(1),
+    .board-card td:nth-child(1) {
+        width: 70px;
+    }
+}
+
+@media (max-width: 500px) {
+
+    .board-main {
+        width: calc(100% - 20px);
+    }
+
+    .board-toolbar h2 {
+        font-size: 24px;
+    }
+
+    .board-header nav {
+        width: 100%;
+
+        flex-wrap: wrap;
+    }
+
+    .board-header a,
+    .board-header button {
+        flex: 1;
+
+        text-align: center;
+    }
+
+    .form-card {
+        padding: 24px 20px;
+    }
+
+    .form-actions {
+        flex-direction: column-reverse;
+    }
+
+    .form-actions a,
+    .form-actions button {
+        width: 100%;
+
+        text-align: center;
+    }
+}

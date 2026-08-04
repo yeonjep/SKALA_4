@@ -1,0 +1,83 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '4.1.0'
+}
+
+group = 'loginauth'
+version = '0.0.1-SNAPSHOT'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    /*
+     * Spring Boot 4.1.0이 관리하는 라이브러리 버전을 사용합니다.
+     * 각 Spring Starter와 MariaDB 드라이버의 버전을 따로 적지 않아도 됩니다.
+     */
+    implementation platform(
+            org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES
+    )
+
+    /*
+     * Web / REST API
+     */
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+
+    /*
+     * 인증 및 인가
+     */
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+
+    /*
+     * 기존 사용자 인증 Repository에서 사용하는 JdbcTemplate
+     */
+    implementation 'org.springframework.boot:spring-boot-starter-jdbc'
+
+    /*
+     * 게시판 Entity 및 Repository 구현
+     *
+     * 포함되는 주요 기능:
+     * - Jakarta Persistence API
+     * - Hibernate ORM
+     * - Spring Data JPA
+     * - JpaRepository
+     */
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+
+    /*
+     * DTO 입력값 검증
+     */
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+    /*
+     * JWT 생성 및 검증
+     */
+    implementation 'com.auth0:java-jwt:4.5.0'
+
+    /*
+     * MariaDB JDBC 드라이버
+     */
+    runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
+
+    /*
+     * Swagger UI (산출물-문서 자동화)
+     */
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.3'
+
+    /*
+     * 테스트
+     */
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.security:spring-security-test'
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}

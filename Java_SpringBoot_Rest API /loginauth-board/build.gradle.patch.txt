@@ -1,0 +1,6 @@
+기존 dependencies 블록에 다음 의존성을 추가합니다.
+
+implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+
+기존 spring-boot-starter-jdbc를 유지해도 되지만, 게시판 Repository를 JPA로 학습하려면 data-jpa가 필요합니다.
+MariaDB 드라이버는 기존 runtimeOnly 의존성을 그대로 사용합니다.

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>게시글 작성</title>
+    <link rel="stylesheet" href="/css/board.css">
+</head>
+<body>
+<header class="board-header">
+    <div>
+        <h1>Enterprise Board</h1>
+        <p>Controller → Service → Repository</p>
+    </div>
+    <nav><a href="/board.html">목록</a></nav>
+</header>
+
+<main class="board-main form-main">
+    <section class="board-card form-card">
+        <h2 id="formTitle">게시글 작성</h2>
+        <form id="postForm">
+            <label for="title">제목</label>
+            <input id="title" name="title" maxlength="200" required>
+
+            <label for="content">내용</label>
+            <textarea id="content" name="content" rows="14" required></textarea>
+
+            <div class="form-actions">
+                <a class="secondary-link" href="/board.html">취소</a>
+                <button class="primary-button" type="submit">저장</button>
+            </div>
+        </form>
+        <p id="message" class="message"></p>
+    </section>
+</main>
+
+<script src="/js/post-form.js"></script>
+</body>
+</html>

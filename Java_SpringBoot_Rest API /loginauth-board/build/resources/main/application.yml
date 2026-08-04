@@ -1,0 +1,74 @@
+server:
+  port: 9090
+
+spring:
+  application:
+    name: loginauth-board
+
+  datasource:
+    url: ${DB_URL:jdbc:mariadb://localhost:53301/sql_db}
+    username: ${DB_USER:root}
+    password: ${DB_PASSWORD:SqlDba-1}
+    driver-class-name: org.mariadb.jdbc.Driver
+
+    hikari:
+      # 최대 커넥션 수
+      maximum-pool-size: 10
+
+      # 항상 유지할 최소 Idle 커넥션
+      minimum-idle: 2
+
+      # DB가 먼저 연결을 종료하기 전에 Hikari가 교체
+      max-lifetime: 600000
+
+      # Idle 커넥션 유지 시간 (5분)
+      idle-timeout: 300000
+
+      # Idle 커넥션 주기적 Keep Alive (2분)
+      keepalive-time: 120000
+
+      # 커넥션 획득 최대 대기 시간
+      connection-timeout: 30000
+
+      # 커넥션 검증 최대 시간
+      validation-timeout: 5000
+
+  # 기존 schema.sql을 이용해 users, posts 테이블 생성
+  sql:
+    init:
+      mode: always
+      encoding: UTF-8
+
+  # 게시판(Post) 도메인에서 사용하는 JPA 설정
+  jpa:
+    hibernate:
+      # 테이블 생성은 schema.sql이 담당
+      ddl-auto: validate
+
+    # View 단계의 Lazy Loading 방지
+    open-in-view: false
+
+    properties:
+      hibernate:
+        format_sql: true
+
+    show-sql: true
+
+app:
+  frontend-origin: ${FRONTEND_ORIGIN:http://localhost:5174}
+
+  cookie:
+    # 로컬 HTTP 개발 환경에서는 false
+    # 운영 HTTPS 환경에서는 true
+    secure: ${COOKIE_SECURE:false}
+
+  jwt:
+    secret: ${JWT_SECRET:change-this-development-secret-key-at-least-32-characters}
+    issuer: ${JWT_ISSUER:loginauth-board}
+    access-token-ttl: ${JWT_ACCESS_TOKEN_TTL:1h}
+
+logging:
+  level:
+    org.hibernate.SQL: DEBUG
+    com.zaxxer.hikari.HikariConfig: DEBUG
+    com.zaxxer.hikari: DEBUG
