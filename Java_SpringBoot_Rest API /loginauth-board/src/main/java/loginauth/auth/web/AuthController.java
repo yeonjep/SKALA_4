@@ -3,12 +3,12 @@ package loginauth.auth.web;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import loginauth.auth.domain.User;
-import loginauth.global.security.CookieService;
-import loginauth.global.security.JwtProperties;
-import loginauth.global.security.JwtProvider;
 import loginauth.auth.service.AuthService;
 import loginauth.auth.web.dto.AuthCheckResponse;
 import loginauth.auth.web.dto.LoginRequest;
+import loginauth.global.security.CookieService;
+import loginauth.global.security.JwtProperties;
+import loginauth.global.security.JwtProvider;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -39,6 +39,30 @@ public class AuthController {
         this.cookieService = cookieService;
     }
 
+    /*
+     * 회원가입
+     *
+     * signup.html이 일반 HTML form 방식으로
+     * application/x-www-form-urlencoded 요청을 보내므로
+     * @RequestBody는 사용하지 않습니다.
+     */
+    @PostMapping("/signup")
+    public void signup(
+            @Valid LoginRequest request,
+            HttpServletResponse response
+    ) throws IOException {
+
+        authService.signUp(
+                request.username(),
+                request.password()
+        );
+
+        response.sendRedirect("/login");
+    }
+
+    /*
+     * 로그인
+     */
     @PostMapping("/login")
     public void login(
             @Valid LoginRequest request,
@@ -74,6 +98,37 @@ public class AuthController {
         response.sendRedirect("/board.html");
     }
 
+    /*
+     * 로그아웃
+     *
+     * ACCESS_TOKEN과 APP_AUTH 쿠키를
+     * Max-Age=0으로 다시 발급하여 브라우저에서 삭제합니다.
+     */
+    @PostMapping("/logout")
+    public void logout(
+            HttpServletResponse response
+    ) throws IOException {
+
+        response.addHeader(
+                HttpHeaders.SET_COOKIE,
+                cookieService
+                        .delete(CookieService.ACCESS_TOKEN)
+                        .toString()
+        );
+
+        response.addHeader(
+                HttpHeaders.SET_COOKIE,
+                cookieService
+                        .delete(CookieService.APP_AUTH)
+                        .toString()
+        );
+
+        response.sendRedirect("/login");
+    }
+
+    /*
+     * 현재 로그인 사용자 확인
+     */
     @GetMapping("/check")
     public AuthCheckResponse check(
             Authentication authentication

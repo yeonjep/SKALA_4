@@ -6,7 +6,7 @@ spring:
     name: loginauth-board
 
   datasource:
-    url: ${DB_URL:jdbc:mariadb://localhost:53301/sql_db}
+    url: ${DB_URL:jdbc:mariadb://localhost:3379/sql_db}
     username: ${DB_USER:root}
     password: ${DB_PASSWORD:SqlDba-1}
     driver-class-name: org.mariadb.jdbc.Driver
