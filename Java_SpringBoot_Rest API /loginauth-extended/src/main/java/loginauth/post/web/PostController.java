@@ -1,3 +1,4 @@
+// 사용자 요청에 대해서 데이터를 주고 받음 (REST API)
 package loginauth.post.web;
 
 import jakarta.validation.Valid;
@@ -19,7 +20,7 @@ public class PostController {
         this.postService = postService;
     }
 
-    @GetMapping
+    @GetMapping // 조회 
     public PageResponse<PostResponse> findAll(
             @RequestParam(required = false) String keyword,
             @RequestParam(defaultValue = "titleContent") String searchType,

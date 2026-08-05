@@ -1,4 +1,6 @@
 # 1단계: Gradle로 Spring Boot 실행 JAR 빌드
+# JDK = JRE + 개발 도구(javac, jar, javadoc 등) # 베이스 이미지가 eclipse-temurin:21-jdk가 설치된 스냅 샷이며, 
+# 통상 실행 가능한 스냅 샷상태로 배포하므로 리눅스 OS를 포함
 FROM eclipse-temurin:21-jdk AS builder
 
 WORKDIR /workspace
