@@ -1,7 +1,9 @@
 # Day 5 서브노트 — REST API 도메인 확장(댓글·좋아요·검색)과 애플리케이션 컨테이너화
 
 **학습 목표**: REST API의 HTTP 메서드 전체 체계와 멱등성 개념을 이해하고, 기존 게시판 도메인 위에 댓글·좋아요·검색 기능을 동일한 패턴으로 확장. 또한 완성된 애플리케이션을 도커 이미지로 빌드·실행하며 컨테이너 기반 배포 구조를 이해.
+
 **실습 대상**: `loginauth-extended` 프로젝트(댓글/좋아요 도메인 신규 추가, `posts` 테이블 확장), 그리고 이를 도커화한 `loginauth-extended-app` 이미지
+
 **진행 방식**: 제공받은 리드미와 실습 코드를 기반으로 DB 테이블을 직접 추가하고, 로컬 실행과 도커 빌드 진행
 
 ---
@@ -20,13 +22,13 @@ REST(Representational State Transfer)는 특정 기술이 아니라 "자원을 �
 | HEAD    | GET과 동일하지만 응답 본문 없이 헤더만 반환                 | 멱등             |
 | OPTIONS | 해당 URL이 지원하는 메서드 확인. CORS preflight에 주로 사용 | 멱등             |
 
-멱등성(idempotency): 같은 요청을 한 번 보내든 여러 번 반복해서 보내든, 결과적으로 서버의 상태가 동일하게 유지되는 성질. "매번 완전히 똑같은 응답이 온다"는 뜻이 아니라, "여러 번 반복해도 자원의 최종 상태가 똑같다"
+멱등성(idempotency): 같은 요청을 한 번 보내든 여러 번 반복해서 보내든, 결과적으로 서버의 상태가 동일하게 유지되는 성질. "매번 완전히 똑같은 응답이 온다"는 뜻이 아니라, "여러 번 반복해도 자원의 최종 상태가 똑같다"는 뜻이다.
 
 ---
 
 ## 2. 오늘 추가된 도메인: 댓글·좋아요·검색
 
-기존 `PostController`가 REST 원칙을 그대로 따르고 있었던 것처럼, 오늘 추가된 `CommentController`, `PostLikeController`도 동일한 패턴을 반복.
+기존 `PostController`가 REST 원칙을 그대로 따르고 있었던 것처럼, 오늘 추가된 `CommentController`, `PostLikeController`도 동일한 패턴을 반복한다.
 
 ### 인증
 
@@ -62,7 +64,7 @@ GET /api/posts?keyword=spring&searchType=titleContent&writer=test&sort=likes&pag
 - `POST /api/posts/{postId}/likes` — 좋아요 등록
 - `DELETE /api/posts/{postId}/likes` — 좋아요 취소
 
-좋아요는 수정(PUT)이 존재하지 않음.
+좋아요는 수정(PUT)이 존재하지 않는다.
 
 ---
 
@@ -76,7 +78,7 @@ posts
   └── 1 : N ── post_likes
 ```
 
-`posts`에 `view_count`(조회수) 컬럼을 추가하고, `comments`와 `post_likes` 두 테이블을 신규 생성함. 두 테이블 모두 `post_id`에 외래키(`ON DELETE CASCADE`)를 걸어, 게시글이 삭제되면 그 글에 달린 댓글·좋아요도 함께 삭제되도록 함. `post_likes`는 `(post_id, username)` 조합에 유니크 제약을 걸어 같은 사용자가 같은 글에 중복으로 좋아요를 등록하지 못하게 제한함.
+`posts`에 `view_count`(조회수) 컬럼을 추가하고, `comments`와 `post_likes` 두 테이블을 신규 생성했다. 두 테이블 모두 `post_id`에 외래키(`ON DELETE CASCADE`)를 걸어, 게시글이 삭제되면 그 글에 달린 댓글·좋아요도 함께 삭제되도록 했다. `post_likes`는 `(post_id, username)` 조합에 유니크 제약을 걸어 같은 사용자가 같은 글에 중복으로 좋아요를 등록하지 못하게 제한했다.
 
 ```sql
 /* 게시글 조회수 컬럼 추가 */
@@ -129,25 +131,27 @@ loginauth
     ├── config / exception / security / web
 ```
 
-## `comment`, `like` 패키지가 추가,내부 구조는 기존 `auth`, `post`와 동일함.
+`comment`, `like` 패키지가 새로 추가되었고, 내부 구조는 기존 `auth`, `post`와 동일하다.
+
+---
 
 ## 5. 애플리케이션 컨테이너화
 
-지금까지는 DB(MariaDB)만 도커 컨테이너로 실행되었고, 스프링 부트 애플리케이션은 항상 로컬(맥북)에서 `./gradlew bootRun` 또는 `java -jar`로 직접 실행하였으나 오늘은 애플리케이션 자체를 도커 이미지로 빌드하고 컨테이너로 실행함.
+지금까지는 DB(MariaDB)만 도커 컨테이너로 실행되었고, 스프링 부트 애플리케이션은 항상 로컬(맥북)에서 `./gradlew bootRun` 또는 `java -jar`로 직접 실행했으나, 오늘은 애플리케이션 자체를 도커 이미지로 빌드하고 컨테이너로 실행했다.
 
 **개념 정리**
 
-- `Dockerfile` — 이미지를 설계 지시서(레시피)
+- `Dockerfile` — 이미지를 만드는 설계 지시서(레시피)
 - `Image` — 그 레시피를 `docker build`로 실행해서 만들어진, 실행에 필요한 모든 것(Java 실행 환경 + jar 파일)이 포함된 읽기 전용 결과물(설계도)
 - `Container` — 그 이미지를 `docker run`으로 실행해서 만들어진 인스턴스
 
-`Dockerfile`(.java 소스) → `Image`(.class) → `Container`(new로 생성한 객체).
+`Dockerfile`(.java 소스) → `Image`(.class) → `Container`(new로 생성한 객체)에 대응한다.
 
 **Dockerfile 핵심 단계 (멀티스테이지 빌드)**
 
-1단계(`builder`): `gradlew`, `build.gradle` 등을 복사하고 `RUN ./gradlew clean bootJar`로 실행 가능한 jar를 빌드.
-2단계(`stage-1`): 1단계에서 만든 jar 파일만 가벼운 이미지에 옮겨 담아 최종 이미지 용량을 줄임.
-`ENTRYPOINT ["java", ..., "-jar", "/app/application.jar"]`로 컨테이너가 시작될 때 자동으로 이 jar를 실행하도록 지정.
+- 1단계(`builder`): `gradlew`, `build.gradle` 등을 복사하고 `RUN ./gradlew clean bootJar`로 실행 가능한 jar를 빌드한다.
+- 2단계(`stage-1`): 1단계에서 만든 jar 파일만 가벼운 이미지에 옮겨 담아 최종 이미지 용량을 줄인다.
+- `ENTRYPOINT ["java", ..., "-jar", "/app/application.jar"]`로 컨테이너가 시작될 때 자동으로 이 jar를 실행하도록 지정한다.
 
 ---
 
