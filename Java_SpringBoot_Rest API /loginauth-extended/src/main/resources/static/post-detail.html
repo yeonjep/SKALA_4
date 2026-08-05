@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>게시글 상세</title>
+    <link rel="stylesheet" href="/css/board.css">
+</head>
+<body>
+<header class="board-header">
+    <div>
+        <p class="eyebrow">CONTENT DETAIL</p>
+        <h1>게시글 상세</h1>
+        <p id="currentUser">인증 확인 중...</p>
+    </div>
+    <nav>
+        <a class="secondary-link" href="/board.html">목록</a>
+        <button id="logout" type="button">로그아웃</button>
+    </nav>
+</header>
+
+<main class="board-main detail-main">
+    <article class="board-card detail-card">
+        <header class="detail-header">
+            <h2 id="postTitle">불러오는 중...</h2>
+            <div id="postMeta" class="detail-meta"></div>
+        </header>
+
+        <div id="postContent" class="detail-content"></div>
+
+        <div class="detail-actions">
+            <button id="likeButton" class="like-button" type="button">
+                좋아요 <span id="likeCount">0</span>
+            </button>
+            <button id="deletePostButton" class="danger-button hidden" type="button">
+                게시글 삭제
+            </button>
+        </div>
+    </article>
+
+    <section class="comments-section">
+        <div class="section-title">
+            <h2>댓글</h2>
+            <span id="commentCount">0</span>
+        </div>
+
+        <form id="commentForm" class="comment-form">
+            <textarea id="commentContent" rows="3"
+                      placeholder="댓글을 입력하세요" required></textarea>
+            <button class="primary-button" type="submit">댓글 등록</button>
+        </form>
+
+        <div id="commentList" class="comment-list"></div>
+    </section>
+</main>
+
+<script src="/js/post-detail.js"></script>
+</body>
+</html>

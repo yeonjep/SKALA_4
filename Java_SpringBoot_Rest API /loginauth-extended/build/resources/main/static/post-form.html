@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>게시글 작성</title>
+    <link rel="stylesheet" href="/css/board.css">
+</head>
+<body>
+<header class="board-header">
+    <div>
+        <p class="eyebrow">CONTENT EDITOR</p>
+        <h1>게시글 작성</h1>
+        <p>인증 사용자 이름은 서버에서 자동으로 적용됩니다.</p>
+    </div>
+    <nav>
+        <a class="secondary-link" href="/board.html">목록</a>
+    </nav>
+</header>
+
+<main class="board-main form-main">
+    <section class="board-card form-card">
+        <form id="postForm">
+            <label>
+                제목
+                <input id="title" maxlength="200" required>
+            </label>
+
+            <label>
+                내용
+                <textarea id="content" rows="14" required></textarea>
+            </label>
+
+            <p id="message" class="message"></p>
+
+            <div class="form-actions">
+                <a class="secondary-link" href="/board.html">취소</a>
+                <button class="primary-button" type="submit">저장</button>
+            </div>
+        </form>
+    </section>
+</main>
+
+<script src="/js/post-form.js"></script>
+</body>
+</html>

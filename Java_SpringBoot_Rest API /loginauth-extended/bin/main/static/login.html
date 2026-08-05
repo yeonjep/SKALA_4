@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Authentication</title>
+    <link rel="stylesheet" href="/css/auth.css">
+</head>
+<body class="auth-page">
+<main class="auth-card">
+    <header>
+        <p class="eyebrow">ENTERPRISE BOARD</p>
+        <h1>Login Authentication</h1>
+        <p>Spring Boot + JWT Cookie Authentication</p>
+    </header>
+
+    <form method="POST" action="/api/auth/login">
+        <label>
+            User ID
+            <input name="username" type="text" autocomplete="username" required>
+        </label>
+
+        <label>
+            Password
+            <input name="password" type="password" autocomplete="current-password" required>
+        </label>
+
+        <button type="submit">Sign In</button>
+    </form>
+
+    <p class="auth-link">
+        계정이 없으신가요?
+        <a href="/signup.html">Create Account</a>
+    </p>
+</main>
+</body>
+</html>

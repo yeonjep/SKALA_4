@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Account</title>
+    <link rel="stylesheet" href="/css/auth.css">
+</head>
+<body class="auth-page">
+<main class="auth-card">
+    <header>
+        <p class="eyebrow">ENTERPRISE BOARD</p>
+        <h1>Create Account</h1>
+        <p>게시판 서비스를 사용할 계정을 생성합니다.</p>
+    </header>
+
+    <form id="signupForm">
+        <label>
+            User ID
+            <input id="username" type="text" minlength="4" maxlength="50" required>
+        </label>
+
+        <label>
+            Password
+            <input id="password" type="password" minlength="8" required>
+        </label>
+
+        <button type="submit">Create Account</button>
+    </form>
+
+    <p id="message" class="message"></p>
+
+    <p class="auth-link">
+        이미 계정이 있으신가요?
+        <a href="/login.html">Sign In</a>
+    </p>
+</main>
+<script src="/js/signup.js"></script>
+</body>
+</html>

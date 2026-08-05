@@ -1,0 +1,42 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    container_name: loginauth-extended-app
+
+    restart: unless-stopped
+
+    ports:
+      - "9999:9999"
+
+    environment:
+      # 기존 호스트(Mac)에 실행 중인 MariaDB 사용
+      DB_URL: jdbc:mariadb://host.docker.internal:53301/sql_db
+      DB_USER: root
+      DB_PASSWORD: SqlDba-1
+
+      COOKIE_SECURE: "false"
+
+      JWT_SECRET: change-this-development-secret-key-at-least-32-characters
+      JWT_ISSUER: loginauth-board-advanced
+      JWT_ACCESS_TOKEN_TTL: 1h
+
+      TZ: Asia/Seoul
+
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+## 이미지를 백그라운드로 생성 및 컨테이너 기동
+# docker compose -f docker-compose.yml up -d
+
+## 이미지 및 컨테이너 삭제
+# docker compose down
+
+## 캐시를 모두 지우고 다시 명시적으로 빌드 명령 동시 진행
+# docker compose down --remove-orphans --rmi local
+# rm -rf build .gradle
+# docker builder prune -f
+# docker compose build --no-cache --pull
+# docker compose up -d --force-recreate
