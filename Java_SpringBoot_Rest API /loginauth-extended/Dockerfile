@@ -56,7 +56,7 @@ ENTRYPOINT ["java", "-XX:MaxRAMPercentage=75.0", "-Djava.security.egd=file:/dev/
 #   --name loginauth-extended-app \
 #   --restart unless-stopped \
 #   -p 9999:9999 \
-#   -e DB_URL="jdbc:mariadb://host.docker.internal:53301/sql_db" \
+#   -e DB_URL="jdbc:mariadb://host.docker.internal:3379/sql_db" \
 #   -e DB_USER="root" \
 #   -e DB_PASSWORD="SqlDba-1" \
 #   -e COOKIE_SECURE="false" \
